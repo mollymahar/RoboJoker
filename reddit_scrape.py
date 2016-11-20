@@ -28,4 +28,4 @@ def convert_posts_to_df(posts):
 
 # works with max 1000 posts, to get more, follow thing here 
 # https://github.com/eleweek/SearchingReddit/blob/master/download_whole_subreddit.py
-convert_posts_to_df(get_all_posts(lim=1000)).to_csv('./10000_reddit.csv')
+convert_posts_to_df(get_all_posts(lim=1000)).to_csv('./1000_reddit.csv', sep='|')
