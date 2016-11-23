@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class='row'>
+    <h5> Below are your ratings for all the jokes </h5>
+    {% for item in result %}
+    <div class="section">
+        Rating for joke {{item}}: {{result[item]}}
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
