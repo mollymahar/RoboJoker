@@ -13,7 +13,7 @@
         {% else %}
         <div class='section'></div>
 
-        Joke {{ loop.index - 1}}
+        Joke {{ offset + loop.index - 1}}
         <br>
 
         {{ jokes[loop.index - 2]}}
@@ -31,7 +31,7 @@
         {% endfor %}
 
         <p>
-            <input type="submit" value="Submit" class="btn">
+            <input type="submit" value="Next" class="btn">
         </p>
     </form>
 </div>
