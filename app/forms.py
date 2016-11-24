@@ -6,20 +6,25 @@ from wtforms import validators
 # example form
 class QuestionForm(Form):
 
-    q1 = RadioField('Joke 1', [validators.optional()], choices=[('1','1 (not funny at all)'),
-    ('2','2'), ('3','3 (somewhat funny)'), ('4','4'), ('5','5 (very funny)')])
+    q1 = RadioField('Joke 1', [validators.optional()], choices=[('1','&#9733; (not funny at all)'),
+    ('2','&#9733; &#9733;'), ('3','&#9733; &#9733; &#9733; (somewhat funny)'), 
+    ('4','&#9733; &#9733; &#9733; &#9733;'), ('5','&#9733; &#9733; &#9733; &#9733; &#9733; (very funny)')])
 
-    q2 = RadioField('Joke 2', [validators.optional()], choices=[('1','1 (not funny at all)'),
-    ('2','2'), ('3','3 (somewhat funny)'), ('4','4'), ('5','5 (very funny)')])
+    q2 = RadioField('Joke 2', [validators.optional()], choices=[('1','&#9733; (not funny at all)'),
+    ('2','&#9733; &#9733;'), ('3','&#9733; &#9733; &#9733; (somewhat funny)'), 
+    ('4','&#9733; &#9733; &#9733; &#9733;'), ('5','&#9733; &#9733; &#9733; &#9733; &#9733; (very funny)')])
 
-    q3 = RadioField('Joke 3', [validators.optional()], choices=[('1','1 (not funny at all)'),
-    ('2','2'), ('3','3 (somewhat funny)'), ('4','4'), ('5','5 (very funny)')])
+    q3 = RadioField('Joke 3', [validators.optional()], choices=[('1','&#9733; (not funny at all)'),
+    ('2','&#9733; &#9733;'), ('3','&#9733; &#9733; &#9733; (somewhat funny)'), 
+    ('4','&#9733; &#9733; &#9733; &#9733;'), ('5','&#9733; &#9733; &#9733; &#9733; &#9733; (very funny)')])
 
-    q4 = RadioField('Joke 4', [validators.optional()], choices=[('1','1 (not funny at all)'),
-    ('2','2'), ('3','3 (somewhat funny)'), ('4','4'), ('5','5 (very funny)')])
+    q4 = RadioField('Joke 4', [validators.optional()], choices=[('1','&#9733; (not funny at all)'),
+    ('2','&#9733; &#9733;'), ('3','&#9733; &#9733; &#9733; (somewhat funny)'), 
+    ('4','&#9733; &#9733; &#9733; &#9733;'), ('5','&#9733; &#9733; &#9733; &#9733; &#9733; (very funny)')])
 
-    q5 = RadioField('Joke 5', [validators.optional()], choices=[('1','1 (not funny at all)'),
-    ('2','2'), ('3','3 (somewhat funny)'), ('4','4'), ('5','5 (very funny)')])
+    q5 = RadioField('Joke 5', [validators.optional()], choices=[('1','&#9733; (not funny at all)'),
+    ('2','&#9733; &#9733;'), ('3','&#9733; &#9733; &#9733; (somewhat funny)'), 
+    ('4','&#9733; &#9733; &#9733; &#9733;'), ('5','&#9733; &#9733; &#9733; &#9733; &#9733; (very funny)')])
 
     # q6 = RadioField('Joke 6', [validators.optional()], choices=[('1','1 (not funny at all)'),
     # ('2','2'), ('3','3 (somewhat funny)'), ('4','4'), ('5','5 (very funny)')])

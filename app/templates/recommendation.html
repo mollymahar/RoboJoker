@@ -1,12 +1,8 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class='row'>
-    <div class="col s12">
-        <p>Here is some joke text. It might go on and on, or it might be just a short one-liner. After you read it, you'll have to rate it below.</p><br>
-
-        <p margin-top="20px">How would you rate this joke?</p>
-
+<div class="site-wrapper-inner-not-centered">
+    <div class="form-check radioGroupBelow">
         <form action="" method="post" name="jokes">
             {{ form.hidden_tag() }}
 
@@ -16,27 +12,33 @@
             {% if loop.index == 1 %}
             <!-- first field is CSRF field - do not display -->
             {% else %}
-            <div class='section'></div>
+            <div class="form-check-inline"></div>
 
             Joke {{ loop.index - 1}}
             <br>
 
-            {{ jokes[loop.index - 2]}}
-            <br>
+            <p class="joke-text">{{ jokes[loop.index - 2]}}</p>
 
             {% for subfield in field %}
-            <tr>
+            <tr class="radioGroupBelow">
+                <br>
                 <td>{{ subfield }}</td>
                 <td>{{ subfield.label }}</td>
             </tr>
             {% endfor %}
-            <br>
+            <br><br>
+            <p><a href="#" data-toggle="collapse" data-target="#demo" class="small">Click here to reveal what we thought you'd rate this joke.</a></p>
+            <!--the id's for each of these will need to come from Flask, so this will need to be updated -->
+            <div id="demo" class="collapse">
+                <p>&#9733; &#9733; &#9733; &#9733; (Replace with actual prediction)</p>
+            </div>
 
             {% endif %}
+            <hr color="gray">
             {% endfor %}
 
             <p>
-                <input type="submit" value="Next Joke!" class="btn">
+                <input type="submit" value="More Jokes!" class="btn btn-md btn-secondary nextjoke">
             </p>
         </form>
     </div>
