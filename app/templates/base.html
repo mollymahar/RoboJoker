@@ -1,27 +1,43 @@
 <html>
 <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
-    <!-- Navigation Bar - not sure if we want to keep this-->
-    <nav>
-        <div class="nav-wrapper teal lighten-2">
-            <a class="brand-logo center title">RoboJoker</a>
-            <div class="nav-options">
-                {% block navcontent %}{% endblock %}
-            </div>
-        </div>
-    </nav>
+    <meta name="description" content="Joke Recommendation user testing for RoboJoker, a UC Berkeley Natural Lanuage Processing final project, Fall 2016.">
+    <meta name="author" content="Yiyi Chen, Jasper Louie, and Molly Mahar">
+
+    <title>RoboJoker</title>
 
     <!-- Compiled and minified CSS -->
-    <link rel=stylesheet href="https://fonts.googleapis.com/css?family=PT+Sans|Amatic+SC">
-    <link rel=stylesheet href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/css/materialize.min.css">
-    <link rel=stylesheet href="/static/style.css" type="text/css">
-    <script src="/static/main.js"></script>
-    <script src="http://code.jquery.com/jquery-1.7.2.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
+    <link rel=stylesheet href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel=stylesheet href="/static/robo-joker.css" type="text/css">
 </head>
+
 <body>
-    <div class='container'>
+    <div class="site-wrapper">
+      <div class="site-wrapper-inner">
+                  <div class="masthead clearfix">
+            <div class="inner">
+              <h3 class="masthead-brand">RoboJoker</h3>
+            </div>
+          </div>
+        <div class="cover-container">
+<div class="inner cover">
         {% block content %}{% endblock %}
     </div>
+</div>
+</div>
+</div>
+
+    <!-- JS Placed at the end of the document so the pages load faster -->
+    <script>window.jQuery || document.write('<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"><\/script>')</script>
+<!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script> -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/static/tooltip.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.0.0/jquery.min.js" integrity="sha384-THPy051/pYDQGanwU6poAc/hOdQxjnOEXzbT+OuUAFqNqFjL+4IGLBgCJC3ZOShY" crossorigin="anonymous"></script>
+    <script>window.jQuery || document.write('<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"><\/script>')</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.2.0/js/tether.min.js" integrity="sha384-Plbmg8JY28KFelvJVai01l8WyZzrYWG825m+cZ0eDDS1f7d/js6ikvy1+X+guPIB" crossorigin="anonymous"></script>
 </body>
 </html>

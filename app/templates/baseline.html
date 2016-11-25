@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="site-wrapper-inner-not-centered">
+    <form action="" method="post" name="jokes">
+        {{ form.hidden_tag() }}
+
+        {% for field in form %}
+
+        {% if loop.index == 1 %}
+        <!-- first field is CSRF field - do not display -->
+        {% else %}
+        <div class='form-check-inline'></div>
+        
+        <div class="form-check radioGroupBelow">
+        Joke {{ offset + loop.index - 1}}
+        <br>
+
+        <p class="joke-text">{{ jokes[loop.index - 2]}}</p>
+
+        {% for subfield in field %}
+            <tr class="radioGroupBelow">
+                <br>
+                <td>{{ subfield }}</td>
+                <td>{{ subfield.label }}</td>
+            </tr>
+        {% endfor %}
+        <br>
+        <hr color="gray">
+
+        {% endif %}
+        {% endfor %}
+
+        <p>
+            <input type="submit" value="Next" class="btn btn-md btn-secondary nextjoke">
+        </p>
+    </form>
+</div>
+{% endblock %}
