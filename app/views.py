@@ -30,12 +30,18 @@ def baseline():
 	offset = (page - 1)*5
 
 	form = QuestionForm()
+	error = None
 
 	if form.validate_on_submit():
 		# get user ratings from form data
 		ratings = [field.data for field in form]
 		# first field is CSRF field - remove that from the output
 		ratings = ratings[1:]
+
+		if all(rating == 'None' for rating in ratings):
+			error = 'Please rate at least 1 joke before proceeding!'
+			return render_template('baseline.html',
+			jokes = jokes_text[offset:offset + 5], offset = offset, form = form, error = error)
 
 		# result: a dictionary of joke ID: user rating so far
 		# current result is stored as a variable in session
@@ -53,7 +59,7 @@ def baseline():
 			return redirect('/baseline')
 
 	return render_template('baseline.html',
-	jokes = jokes_text[offset:offset + 5], offset = offset, form = form)
+	jokes = jokes_text[offset:offset + 5], offset = offset, form = form, error = error)
 
 @myapp.route('/update', methods=['GET','POST'])
 def update():

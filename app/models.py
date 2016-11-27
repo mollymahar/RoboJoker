@@ -87,8 +87,14 @@ def get_top_five_jokes(ratings_dict):
         return None, None, None
 
     rating_tuples = list(ratings_dict.items())
-    indices = [int(rating[0]) for rating in rating_tuples]
-    ratings = [int(rating[1]) for rating in rating_tuples]
+    indices = []
+    ratings = []
+    for rating in rating_tuples:
+        if rating[1] == 'None':
+            pass
+        else:
+            indices += [int(rating[0])]
+            ratings += [int(rating[1])]
 
     indices, ratings = np.asarray(indices), np.asarray(ratings)
     guesses = guess_ratings(indices, ratings, all_latent_topics)
