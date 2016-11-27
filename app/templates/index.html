@@ -5,14 +5,20 @@
             <h1 class="cover-heading">Welcome to RoboJoker!</h1>
             <p class="lead">Thanks for exploring humor with us! Here's what's going to happen:</p>
             <ol>
-              <li>We will present you with 20 jokes, one at a time.</li>
+              <li>We will present you with 20 jokes, five at a time.</li>
               <li>For each joke, you'll give us a rating of how good you think the joke is.</li>
               <li>We'll feed your ratings into our super-secret algorithm.</li>
-              <li>Then we'll present you with some other jokes that we think you might like, and we'll have you rate those, too.</li>
+              <li>Then we'll present you with some other jokes that we think you might like, and we'll have you rate those, too. You can view and rate as many of those as you like, in sets of five.</li>
             </ol>
             <p>And that's about it!</p><br>
             <a href="{{ url_for('baseline') }}" class="btn btn-lg btn-secondary">I'm ready for some jokes!</a>
             </p>
+          </div>
+
+          <div class="mastfoot">
+            <div class="inner">
+              <h6>RoboJoker is a joke recommendation engine, part of a class project for natural language processing at UC Berkeley. Joke text was sourced from Comedy Central (jokes.cc.com), OneLineFun.com, and Reddit.</h6>
+            </div>
           </div>
 
 {% endblock %}
