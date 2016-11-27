@@ -57,15 +57,18 @@ def baseline():
 
 @myapp.route('/update', methods=['GET','POST'])
 def update():
-	result = json.loads(session['result'])
-	# TODO: Some ML magic here
 	return render_template('update.html')
 
 @myapp.route('/recommendation', methods=['GET','POST'])
 def recommendation():
-	jokes_df = models.get_random_jokes(5)
-	jokes_idx = list(jokes_df.index)
-	jokes_text = list(jokes_df['text'])
+	result = json.loads(session['result'])
+	error = None
+
+	# TODO: Update in the future if anything changes
+	jokes_idx, jokes_text, guessed_ratings = models.get_top_five_jokes(result)
+
+	if jokes_idx is None:
+		error = 'This is embarrassing - we are having some backend issues at the moment, please check back later'
 
 	form = QuestionForm()
 
@@ -76,14 +79,16 @@ def recommendation():
 		ratings = ratings[1:]
 
 		# result: a dictionary of joke ID: user rating so far
-		result = dict()
 		for i in range(len(ratings)):
 			result[str(jokes_idx[i])] = ratings[i]
+
+		session['result'] = json.dumps(result)
 
 		# TODO: some dark ML magic should happen here!
 		return redirect('/recommendation')
 
-	return render_template('recommendation.html', jokes = jokes_text, form = form)
+	return render_template('recommendation.html',
+	error=error, jokes = jokes_text, ratings = guessed_ratings, form = form)
 
 @myapp.route('/results', methods=['GET','POST'])
 def results():
