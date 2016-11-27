@@ -2,6 +2,12 @@
 
 {% block content %}
 <div class="site-wrapper-inner-not-centered">
+    {% if error %}
+    <p class="error">
+        <strong> Error:</strong>
+        {{ error }}
+    </p>
+    {% endif %}
     <form action="" method="post" name="jokes">
         {{ form.hidden_tag() }}
 
@@ -11,7 +17,7 @@
         <!-- first field is CSRF field - do not display -->
         {% else %}
         <div class='form-check-inline'></div>
-        
+
         <div class="form-check radioGroupBelow">
         Joke {{ offset + loop.index - 1}}
         <br>

@@ -2,6 +2,12 @@
 
 {% block content %}
 <div class="site-wrapper-inner-not-centered">
+    {% if error %}
+    <p class="error">
+        <strong> Error:</strong>
+        {{ error }}
+    </p>
+    {% else %}
     <div class="form-check radioGroupBelow">
         <form action="" method="post" name="jokes">
             {{ form.hidden_tag() }}
@@ -42,5 +48,6 @@
             </p>
         </form>
     </div>
+    {% endif %}
 </div>
 {% endblock %}

@@ -30,12 +30,18 @@ def baseline():
 	offset = (page - 1)*5
 
 	form = QuestionForm()
+	error = None
 
 	if form.validate_on_submit():
 		# get user ratings from form data
 		ratings = [field.data for field in form]
 		# first field is CSRF field - remove that from the output
 		ratings = ratings[1:]
+
+		if all(rating == 'None' for rating in ratings):
+			error = 'Please rate at least 1 joke before proceeding!'
+			return render_template('baseline.html',
+			jokes = jokes_text[offset:offset + 5], offset = offset, form = form, error = error)
 
 		# result: a dictionary of joke ID: user rating so far
 		# current result is stored as a variable in session
@@ -53,19 +59,22 @@ def baseline():
 			return redirect('/baseline')
 
 	return render_template('baseline.html',
-	jokes = jokes_text[offset:offset + 5], offset = offset, form = form)
+	jokes = jokes_text[offset:offset + 5], offset = offset, form = form, error = error)
 
 @myapp.route('/update', methods=['GET','POST'])
 def update():
-	result = json.loads(session['result'])
-	# TODO: Some ML magic here
 	return render_template('update.html')
 
 @myapp.route('/recommendation', methods=['GET','POST'])
 def recommendation():
-	jokes_df = models.get_random_jokes(5)
-	jokes_idx = list(jokes_df.index)
-	jokes_text = list(jokes_df['text'])
+	result = json.loads(session['result'])
+	error = None
+
+	# TODO: Update in the future if anything changes
+	jokes_idx, jokes_text, guessed_ratings = models.get_top_five_jokes(result)
+
+	if jokes_idx is None:
+		error = 'This is embarrassing - we are having some backend issues at the moment, please check back later'
 
 	form = QuestionForm()
 
@@ -76,14 +85,16 @@ def recommendation():
 		ratings = ratings[1:]
 
 		# result: a dictionary of joke ID: user rating so far
-		result = dict()
 		for i in range(len(ratings)):
 			result[str(jokes_idx[i])] = ratings[i]
+
+		session['result'] = json.dumps(result)
 
 		# TODO: some dark ML magic should happen here!
 		return redirect('/recommendation')
 
-	return render_template('recommendation.html', jokes = jokes_text, form = form)
+	return render_template('recommendation.html',
+	error=error, jokes = jokes_text, ratings = guessed_ratings, form = form)
 
 @myapp.route('/results', methods=['GET','POST'])
 def results():
