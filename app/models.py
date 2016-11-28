@@ -51,7 +51,7 @@ def load_latent_topics():
     global ALL_LATENT_TOPICS
     if ALL_LATENT_TOPICS is None:
         try:
-            ALL_LATENT_TOPICS = np.load('latent_topics.npy')
+            ALL_LATENT_TOPICS = np.load('docvec.npy')
             print('successfully loaded latent topics for jokes from file')
             return ALL_LATENT_TOPICS
         except:
@@ -72,11 +72,11 @@ def guess_ratings(indices, ratings, joke_features):
     clf = linear_model.Ridge (alpha = .1)
     y_pred = clf.fit(joke_features[indices], ratings).predict(joke_features)
     y_pred -= np.mean(y_pred)
-    y_pred *= 1.5/np.std(y_pred)
+    y_pred *= 1.0/np.std(y_pred)
     y_pred += 2.5
-    y_pred = y_pred.round()
-    y_pred[np.where(y_pred > 5)] = 5
-    y_pred[np.where(y_pred < 1)] = 1
+    # y_pred = y_pred.round()
+    # y_pred[np.where(y_pred > 5)] = 5
+    # y_pred[np.where(y_pred < 1)] = 1
     return y_pred
 
 # get top five jokes
@@ -104,7 +104,7 @@ def get_top_five_jokes(ratings_dict):
     joke_rankings = np.argsort(guesses)
 
     while len(top_five_idx) < 5:
-        pos = random.randint(-500, -1)
+        pos = random.randint(-200, -1)
         joke_index = joke_rankings[pos]
 
         while joke_index in indices or joke_index in top_five_idx:
