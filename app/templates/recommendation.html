@@ -7,7 +7,7 @@
         <strong> Error:</strong>
         {{ error }}
     </p>
-    {% else %}
+    {% endif %}
     <div class="form-check radioGroupBelow">
         <form action="" method="post" name="jokes">
             {{ form.hidden_tag() }}
@@ -48,6 +48,5 @@
             </p>
         </form>
     </div>
-    {% endif %}
 </div>
 {% endblock %}

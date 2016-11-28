@@ -2,6 +2,7 @@ from app import myapp, models
 from flask import render_template, redirect, request, session, url_for, escape, flash
 from .forms import QuestionForm
 import requests, json, re, datetime
+from time import time
 
 """
 View functions:
@@ -48,7 +49,14 @@ def baseline():
 		result = dict() if 'result' not in session else json.loads(session['result'])
 		for i in range(len(ratings)):
 			result[str(jokes_idx[offset + i])] = ratings[i]
+
 		session['result'] = json.dumps(result)
+
+		# writing user's response into json file
+		if 'filename' not in session:
+			session['filename'] = 'responses/' + str(round(time())) + '.json'
+		filename = session['filename']
+		models.write_response_to_json(filename, result)
 
 		# if reached last page, move onto next phase
 		# otherwise increment page by 1
@@ -84,11 +92,20 @@ def recommendation():
 		# first field is CSRF field - remove that from the output
 		ratings = ratings[1:]
 
+		if all(rating == 'None' for rating in ratings):
+			error = 'Please rate at least 1 joke before proceeding!'
+			return render_template('recommendation.html',
+			error=error, jokes = jokes_text, ratings = guessed_ratings, form = form)
+
 		# result: a dictionary of joke ID: user rating so far
 		for i in range(len(ratings)):
 			result[str(jokes_idx[i])] = ratings[i]
 
 		session['result'] = json.dumps(result)
+
+		# writing user's response into json file
+		filename = session['filename']
+		models.write_response_to_json(filename, result)
 
 		# TODO: some dark ML magic should happen here!
 		return redirect('/recommendation')
