@@ -6,6 +6,7 @@ import nltk, re, pprint
 import sys
 from sklearn import linear_model
 import random
+import json
 
 ALL_JOKES = None
 PRINT_VERBOSE = True
@@ -79,6 +80,10 @@ def guess_ratings(indices, ratings, joke_features):
     y_pred[np.where(y_pred < 1)] = 1
     return y_pred
 
+def write_response_to_json(filename, ratings_dict):
+    with open(filename, 'w') as outfile:
+        json.dump(ratings_dict, outfile, separators=(',', ':'))
+
 # get top five jokes
 def get_top_five_jokes(ratings_dict):
     all_jokes = load_jokes()['text']
@@ -115,7 +120,7 @@ def get_top_five_jokes(ratings_dict):
         top_five_txt += [all_jokes[joke_index]]
         top_five_rating += [guesses[joke_index]]
 
-    print(top_five_idx)
-    print(top_five_txt)
-    print(top_five_rating)
+    # print(top_five_idx)
+    # print(top_five_txt)
+    # print(top_five_rating)
     return top_five_idx, top_five_txt, top_five_rating
