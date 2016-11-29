@@ -3,6 +3,7 @@ from flask import render_template, redirect, request, session, url_for, escape, 
 from .forms import QuestionForm
 import requests, json, re, datetime
 from time import time
+import random
 
 """
 View functions:
@@ -71,50 +72,41 @@ def baseline():
 
 @myapp.route('/update', methods=['GET','POST'])
 def update():
+	joke_orders = ['good', 'random', 'bad']
+	random.shuffle(joke_orders)
+
+	session['bee'] = joke_orders[0]
+	session['fish'] = joke_orders[1]
+	session['octopus'] = joke_orders[2]
+
 	return render_template('update.html')
 
-@myapp.route('/recommendation', methods=['GET','POST'])
-def recommendation():
-	result = json.loads(session['result'])
-	error = None
+@myapp.route('/bee', methods=['GET', 'POST'])
+def bee():
+	joke_getter = get_joke_getter(session['bee'])
+	return recommended_jokes(joke_getter, 'bee.html', '/fish')
 
-	# TODO: Update in the future if anything changes
-	jokes_idx, jokes_text, guessed_ratings = models.get_top_five_jokes(result)
+@myapp.route('/fish', methods=['GET', 'POST'])
+def fish():
+	joke_getter = get_joke_getter(session['fish'])
+	return recommended_jokes(joke_getter, 'fish.html', '/octopus')
 
-	if jokes_idx is None:
-		error = 'This is embarrassing - we are having some backend issues at the moment, please check back later'
+@myapp.route('/octopus', methods=['GET', 'POST'])
+def octopus():
+	joke_getter = get_joke_getter(session['octopus'])
+	return recommended_jokes(joke_getter, 'octopus.html', '/results')
 
-	form = QuestionForm()
+def get_joke_getter(joke_type):
+	joke_getter = None
+	if joke_type == 'good':
+		joke_getter = models.get_good_jokes
+	elif joke_type == 'random':
+		joke_getter = models.get_median_jokes
+	else:
+		joke_getter = models.get_bad_jokes
+	return joke_getter
 
-	if form.validate_on_submit():
-		# get user ratings from form data
-		ratings = [field.data for field in form]
-		# first field is CSRF field - remove that from the output
-		ratings = ratings[1:]
-
-		if all(rating == 'None' for rating in ratings):
-			error = 'Please rate at least 1 joke before proceeding!'
-			return render_template('recommendation.html',
-			error=error, jokes = jokes_text, ratings = guessed_ratings, form = form)
-
-		# result: a dictionary of joke ID: user rating so far
-		for i in range(len(ratings)):
-			result[str(jokes_idx[i])] = ratings[i]
-
-		session['result'] = json.dumps(result)
-
-		# writing user's response into json file
-		filename = session['filename']
-		models.write_response_to_json(filename, result)
-
-		# TODO: some dark ML magic should happen here!
-		return redirect('/recommendation')
-
-	return render_template('recommendation.html',
-	error=error, jokes = jokes_text, ratings = guessed_ratings, form = form)
-
-
-def recommended_jokes(joke_getter):
+def recommended_jokes(joke_getter, current_html_page, next_html_handler):
 	result = json.loads(session['result'])
 	error = None
 
@@ -134,7 +126,7 @@ def recommended_jokes(joke_getter):
 
 		if all(rating == 'None' for rating in ratings):
 			error = 'Please rate at least 1 joke before proceeding!'
-			return render_template('recommendation.html',
+			return render_template(current_html_page,
 			error=error, jokes = jokes_text, ratings = guessed_ratings, form = form)
 
 		# result: a dictionary of joke ID: user rating so far
@@ -148,24 +140,53 @@ def recommended_jokes(joke_getter):
 		models.write_response_to_json(filename, result)
 
 		# TODO: some dark ML magic should happen here!
-		return redirect('/recommendation')
+		return redirect(next_html_handler)
 
-	return render_template('recommendation.html',
+	return render_template(current_html_page,
 	error=error, jokes = jokes_text, ratings = guessed_ratings, form = form)
-
-@myapp.route('/goodjokes', methods=['GET','POST'])
-def good_jokes():
-	return recommended_jokes(models.get_good_jokes)
-
-@myapp.route('/badjokes', methods=['GET','POST'])
-def bad_jokes():
-	return recommended_jokes(models.get_bad_jokes)
-
-@myapp.route('/medianjokes', methods=['GET','POST'])
-def median_jokes():
-	return recommended_jokes(models.get_median_jokes)
 
 @myapp.route('/results', methods=['GET','POST'])
 def results():
 	result = json.loads(session['result'])
 	return render_template('results.html', result = result)
+
+
+# @myapp.route('/recommendation', methods=['GET','POST'])
+# def recommendation():
+# 	result = json.loads(session['result'])
+# 	error = None
+#
+# 	# TODO: Update in the future if anything changes
+# 	jokes_idx, jokes_text, guessed_ratings = models.get_top_five_jokes(result)
+#
+# 	if jokes_idx is None:
+# 		error = 'This is embarrassing - we are having some backend issues at the moment, please check back later'
+#
+# 	form = QuestionForm()
+#
+# 	if form.validate_on_submit():
+# 		# get user ratings from form data
+# 		ratings = [field.data for field in form]
+# 		# first field is CSRF field - remove that from the output
+# 		ratings = ratings[1:]
+#
+# 		if all(rating == 'None' for rating in ratings):
+# 			error = 'Please rate at least 1 joke before proceeding!'
+# 			return render_template('recommendation.html',
+# 			error=error, jokes = jokes_text, ratings = guessed_ratings, form = form)
+#
+# 		# result: a dictionary of joke ID: user rating so far
+# 		for i in range(len(ratings)):
+# 			result[str(jokes_idx[i])] = ratings[i]
+#
+# 		session['result'] = json.dumps(result)
+#
+# 		# writing user's response into json file
+# 		filename = session['filename']
+# 		models.write_response_to_json(filename, result)
+#
+# 		# TODO: some dark ML magic should happen here!
+# 		return redirect('/recommendation')
+#
+# 	return render_template('recommendation.html',
+# 	error=error, jokes = jokes_text, ratings = guessed_ratings, form = form)

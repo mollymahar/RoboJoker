@@ -119,11 +119,9 @@ def get_top_five_jokes(ratings_dict):
             top_five_txt += [all_jokes[joke_index]]
             top_five_rating += [guesses[joke_index]]
 
-        
-
-    print(top_five_idx)
-    print(top_five_txt)
-    print(top_five_rating)
+    # print(top_five_idx)
+    # print(top_five_txt)
+    # print(top_five_rating)
     return top_five_idx, top_five_txt, top_five_rating
 
 # get top five jokes
@@ -161,11 +159,11 @@ def get_n_jokes(ratings_dict, n, min_index, max_index):
             top_five_txt += [all_jokes[joke_index]]
             top_five_rating += [guesses[joke_index]]
 
-        
 
-    print(top_five_idx)
-    print(top_five_txt)
-    print(top_five_rating)
+
+    # print(top_five_idx)
+    # print(top_five_txt)
+    # print(top_five_rating)
     return top_five_idx, top_five_txt, top_five_rating
 
 def get_good_jokes(ratings_dict):
