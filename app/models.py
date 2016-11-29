@@ -33,6 +33,7 @@ def create_combined_jokes_file():
     # combining both jokes
     jokes_data = pd.concat([cc_jokes, one_liner_jokes], axis=0, ignore_index=True)
     cprint('Total number of jokes: {}'.format(jokes_data.shape[0]))
+    NUM_JOKES = jokes_data.shape[0]
 
     jokes = jokes_data[['text', 'type', 'tags', 'rating', 'num_ratings', 'link']]
     jokes.to_csv('combined_jokes.csv', index_label='ID')
@@ -52,7 +53,7 @@ def load_latent_topics():
     global ALL_LATENT_TOPICS
     if ALL_LATENT_TOPICS is None:
         try:
-            ALL_LATENT_TOPICS = np.load('docvec.npy')
+            ALL_LATENT_TOPICS = np.load('combined_features.npy')
             print('successfully loaded latent topics for jokes from file')
             return ALL_LATENT_TOPICS
         except:
@@ -112,15 +113,67 @@ def get_top_five_jokes(ratings_dict):
         pos = random.randint(-200, -1)
         joke_index = joke_rankings[pos]
 
-        while joke_index in indices or joke_index in top_five_idx:
-            pos -= 1
+        if joke_index not in indices and joke_index not in top_five_idx:
             joke_index = joke_rankings[pos]
+            top_five_idx += [joke_index]
+            top_five_txt += [all_jokes[joke_index]]
+            top_five_rating += [guesses[joke_index]]
 
-        top_five_idx += [joke_index]
-        top_five_txt += [all_jokes[joke_index]]
-        top_five_rating += [guesses[joke_index]]
+        
 
-    # print(top_five_idx)
-    # print(top_five_txt)
-    # print(top_five_rating)
+    print(top_five_idx)
+    print(top_five_txt)
+    print(top_five_rating)
     return top_five_idx, top_five_txt, top_five_rating
+
+# get top five jokes
+def get_n_jokes(ratings_dict, n, min_index, max_index):
+    all_jokes = load_jokes()['text']
+    all_latent_topics = load_latent_topics()
+    if all_latent_topics is None:
+        return None, None, None
+
+    rating_tuples = list(ratings_dict.items())
+    indices = []
+    ratings = []
+    for rating in rating_tuples:
+        if rating[1] == 'None':
+            pass
+        else:
+            indices += [int(rating[0])]
+            ratings += [int(rating[1])]
+
+    indices, ratings = np.asarray(indices), np.asarray(ratings)
+    guesses = guess_ratings(indices, ratings, all_latent_topics)
+
+    top_five_idx, top_five_txt, top_five_rating = [], [], []
+
+    joke_rankings = np.argsort(guesses)
+
+    while len(top_five_idx) < n:
+        pos = random.randint(min_index, max_index)
+        print(pos)
+        joke_index = joke_rankings[pos]
+
+        if joke_index not in indices and joke_index not in top_five_idx:
+            joke_index = joke_rankings[pos]
+            top_five_idx += [joke_index]
+            top_five_txt += [all_jokes[joke_index]]
+            top_five_rating += [guesses[joke_index]]
+
+        
+
+    print(top_five_idx)
+    print(top_five_txt)
+    print(top_five_rating)
+    return top_five_idx, top_five_txt, top_five_rating
+
+def get_good_jokes(ratings_dict):
+    return get_n_jokes(ratings_dict, 5, -200, -1)
+
+def get_bad_jokes(ratings_dict):
+    return get_n_jokes(ratings_dict, 5, 0, 200)
+
+def get_median_jokes(ratings_dict):
+    global ALL_JOKES
+    return get_n_jokes(ratings_dict, 5, ALL_JOKES.shape[0]//2-100, ALL_JOKES.shape[0]//2+100)
