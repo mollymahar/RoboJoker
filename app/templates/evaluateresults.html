@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="site-wrapper-inner-not-centered">
+    {% if error %}
+    <p class="error">
+        <strong> Error:</strong>
+        {{ error }}
+    </p>
+    {% endif %}
+    <div class="form-check radioGroupBelow">
+        <form action="" method="post" name="jokes">
+            {{ form.hidden_tag() }}
+
+
+            {% for field in form %}
+
+            {% if loop.index == 1 %}
+            <!-- first field is CSRF field - do not display -->
+            {% else %}
+            <div class="form-check-inline"></div>
+
+            Joke {{ loop.index - 1}}
+            <br>
+
+            <p class="joke-text">{{ jokes[loop.index - 2]}}</p>
+
+            <p class="predicted-rating"> Predicted Rating: {{guessed_ratings[loop.index - 2]}}
+                <br> Your Actual Rating: {{ratings[loop.index - 2]}}
+                <br> Joke Group: {{group[loop.index - 2]}}
+            <br><br>
+
+            <!-- <p><a href="#" data-toggle="collapse" data-target="#demo" class="small">Click here to reveal what we thought you'd rate this joke.</a></p> -->
+            <!--the id's for each of these will need to come from Flask, so this will need to be updated -->
+            <!-- <div id="demo" class="collapse">
+                <p>&#9733; &#9733; &#9733; &#9733; (Replace with actual prediction)</p>
+            </div> -->
+
+            {% endif %}
+            <hr color="gray">
+            {% endfor %}
+
+            For this evaluation there are 5 jokes that are good, bad, and median (in the middle of our recommendations) 
+            <br>Ratings Averages:
+            <br>Good Jokes: {{good_avg}}
+            <br>Median Jokes: {{median_avg}}
+            <br>Bad Jokes: {{bad_avg}}
+            <p>
+                <input type="submit" value="More Jokes!" class="btn btn-md btn-secondary nextjoke">
+            </p>
+        </form>
+    </div>
+</div>
+{% endblock %}

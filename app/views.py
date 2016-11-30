@@ -1,8 +1,9 @@
 from app import myapp, models
 from flask import render_template, redirect, request, session, url_for, escape, flash
-from .forms import QuestionForm
+from .forms import QuestionForm, EvaluateForm
 import requests, json, re, datetime
 from time import time
+import numpy as np
 
 """
 View functions:
@@ -169,3 +170,109 @@ def median_jokes():
 def results():
 	result = json.loads(session['result'])
 	return render_template('results.html', result = result)
+
+@myapp.route('/evaluate', methods=['GET','POST'])
+def evaluate():
+	result = json.loads(session['result'])
+	error = None
+
+	# TODO: Update in the future if anything changes
+	models_list = [models.get_good_jokes(result), models.get_median_jokes(result), models.get_bad_jokes(result)]
+	indices, texts, ratings = [], [], []
+	for model in models_list:
+		indices += model[0]
+		texts += model[1]
+		ratings += model[2]
+	print(indices)
+	print(texts)
+	print(ratings)
+
+	shuffled_indices = np.arange(15)
+	np.random.shuffle(shuffled_indices)
+	# tells you which jokes are good(1), bad(-1), median(0)
+
+	evaluate_key = (shuffled_indices < 5).astype(int) + -1*(shuffled_indices > 9).astype(int)
+	jokes_idx, jokes_text, guessed_ratings = [], [], []
+	for index in shuffled_indices:
+		jokes_idx.append(int(indices[index]))
+		jokes_text.append(texts[index])
+		guessed_ratings.append(ratings[index]) 
+
+	if jokes_idx is None:
+		error = 'This is embarrassing - we are having some backend issues at the moment, please check back later'
+
+	form = EvaluateForm()
+
+	if form.validate_on_submit():
+		# get user ratings from form data
+		ratings = [field.data for field in form]
+		# first field is CSRF field - remove that from the output
+		ratings = ratings[1:]
+
+		if all(rating == 'None' for rating in ratings):
+			error = 'Please rate at least 1 joke before proceeding!'
+			return render_template('recommendation.html',
+			error=error, jokes = jokes_text, ratings = guessed_ratings, form = form)
+
+		# result: a dictionary of joke ID: user rating so far
+		for i in range(len(ratings)):
+			result[str(jokes_idx[i])] = ratings[i]
+
+		session['result'] = json.dumps(result)
+		session['evaluateresults'] = json.dumps({'jokes_idx':jokes_idx, 'jokes_text':jokes_text, 'guessed_ratings':guessed_ratings, 'ratings':ratings, 'evaluate_key':evaluate_key.tolist()})
+
+		# writing user's response into json file
+		filename = session['filename']
+		models.write_response_to_json(filename, result)
+
+		# TODO: some dark ML magic should happen here!
+		return redirect('/evaluateresults')
+
+	return render_template('recommendation.html',
+	error=error, jokes = jokes_text, ratings = guessed_ratings, form = form)
+
+@myapp.route('/evaluateresults', methods=['GET','POST'])
+def evaluateresult():
+	evaluateresult = json.loads(session['evaluateresults'])
+	error = None
+
+	jokes_idx, jokes_text, guessed_ratings = evaluateresult['jokes_idx'], evaluateresult['jokes_text'], evaluateresult['guessed_ratings']
+	ratings, evaluate_key = evaluateresult['ratings'], evaluateresult['evaluate_key'] 
+	if jokes_idx is None:
+		error = 'This is embarrassing - we are having some backend issues at the moment, please check back later'
+	
+	# calc avgs
+	def avg_ratings_by_labels(ratings, labels):
+		print('here are labels', labels)
+		output = [0,0,0]
+		for i,l in enumerate(labels):
+			output[l] += float(ratings[i])
+		for i in range(3):
+			output[i] /= 5.0
+		return output
+	avgs = avg_ratings_by_labels(ratings, evaluate_key)
+	good_avg, median_avg, bad_avg = avgs[1], avgs[0], avgs[-1]
+	form = EvaluateForm()
+
+	# convert numeric labels to strings
+	groups = []
+	for l in evaluate_key:
+		if l == 0:
+			groups.append('median')
+		if l == 1:
+			groups.append('good')
+		if l == 0:
+			groups.append('bad')
+
+	# round guessed ratings and cap at 5
+	def round_cap_rating(rating):
+		if rating > 5:
+			return '5.0'
+		else:
+			return "{0:.2f}".format(rating)
+
+	rounded_ratings = list(map(round_cap_rating, guessed_ratings))
+	print(rounded_ratings)
+
+	return render_template('evaluateresults.html',
+	error=error, jokes = jokes_text, ratings=ratings, group=groups, guessed_ratings = rounded_ratings, form = form, good_avg=good_avg, bad_avg=bad_avg, median_avg=median_avg)
