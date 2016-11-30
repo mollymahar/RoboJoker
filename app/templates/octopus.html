@@ -1,11 +1,4 @@
 {% extends 'base.html' %}
-{% block navbar %}
-<nav class="nav nav-masthead">
-  <a class="nav-link disabled" href="{{ url_for('bee')}}">bee &#x1F41D; jokes</a>
-  <a class="nav-link disabled" href="{{ url_for('fish')}}">fish &#x1F420; jokes </a>
-  <a class="nav-link active" href="">octopus &#x1F419; jokes</a>
-</nav>
-{% endblock %}
 
 {% block content %}
 <div class="site-wrapper-inner-not-centered">
@@ -45,10 +38,8 @@
             <hr color="gray">
             {% endfor %}
 
-            <!-- Not sure how to combine the input value necessary for Flask into the links
-            with emoji's that we'd want to show, nor how to deal with disabled links in Flask or how to keep track of the three pages and which has been visited... -->
             <p>
-            <input type="submit" value="Submit!" class="btn btn-lg btn-secondary">
+            <input type="submit" value="Next" class="btn btn-lg btn-secondary">
             </p>
             <br>
         </form>

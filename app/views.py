@@ -72,35 +72,41 @@ def baseline():
 
 @myapp.route('/update', methods=['GET','POST'])
 def update():
-	joke_orders = ['good', 'random', 'bad']
-	random.shuffle(joke_orders)
+	page_orders = ['bee', 'fish', 'octopus']
+	random.shuffle(page_orders)
 
-	session['bee'] = joke_orders[0]
-	session['fish'] = joke_orders[1]
-	session['octopus'] = joke_orders[2]
+	session['page_1'] = page_orders[0]
+	session['page_2'] = page_orders[1]
+	session['page_3'] = page_orders[2]
 
 	return render_template('update.html')
 
-@myapp.route('/bee', methods=['GET', 'POST'])
-def bee():
-	joke_getter = get_joke_getter(session['bee'])
-	return recommended_jokes(joke_getter, 'bee.html', '/fish')
+@myapp.route('/page_1', methods=['GET', 'POST'])
+def page_1():
+	joke_getter = get_joke_getter(session['page_1'])
+	current_html_page = session['page_1'] + '.html'
+	next_html_handler = '/page_2'
+	return recommended_jokes(joke_getter, current_html_page, next_html_handler)
 
-@myapp.route('/fish', methods=['GET', 'POST'])
-def fish():
-	joke_getter = get_joke_getter(session['fish'])
-	return recommended_jokes(joke_getter, 'fish.html', '/octopus')
+@myapp.route('/page_2', methods=['GET', 'POST'])
+def page_2():
+	joke_getter = get_joke_getter(session['page_2'])
+	current_html_page = session['page_2'] + '.html'
+	next_html_handler = '/page_3'
+	return recommended_jokes(joke_getter, current_html_page, next_html_handler)
 
-@myapp.route('/octopus', methods=['GET', 'POST'])
-def octopus():
-	joke_getter = get_joke_getter(session['octopus'])
-	return recommended_jokes(joke_getter, 'octopus.html', '/results')
+@myapp.route('/page_3', methods=['GET', 'POST'])
+def page_3():
+	joke_getter = get_joke_getter(session['page_3'])
+	current_html_page = session['page_3'] + '.html'
+	next_html_handler = '/results'
+	return recommended_jokes(joke_getter, current_html_page, next_html_handler)
 
-def get_joke_getter(joke_type):
+def get_joke_getter(page_type):
 	joke_getter = None
-	if joke_type == 'good':
+	if page_type == 'bee':
 		joke_getter = models.get_good_jokes
-	elif joke_type == 'random':
+	elif page_type == 'fish':
 		joke_getter = models.get_median_jokes
 	else:
 		joke_getter = models.get_bad_jokes
