@@ -99,7 +99,7 @@ def page_2():
 def page_3():
 	joke_getter = get_joke_getter(session['page_3'])
 	current_html_page = session['page_3'] + '.html'
-	next_html_handler = '/results'
+	next_html_handler = '/completion'
 	return recommended_jokes(joke_getter, current_html_page, next_html_handler)
 
 def get_joke_getter(page_type):
@@ -151,11 +151,14 @@ def recommended_jokes(joke_getter, current_html_page, next_html_handler):
 	return render_template(current_html_page,
 	error=error, jokes = jokes_text, ratings = guessed_ratings, form = form)
 
-@myapp.route('/results', methods=['GET','POST'])
-def results():
-	result = json.loads(session['result'])
-	return render_template('results.html', result = result)
+@myapp.route('/completion', methods=['GET','POST'])
+def completion():
+	return render_template('completion.html')
 
+# @myapp.route('/results', methods=['GET','POST'])
+# def results():
+# 	result = json.loads(session['result'])
+# 	return render_template('results.html', result = result)
 
 # @myapp.route('/recommendation', methods=['GET','POST'])
 # def recommendation():
