@@ -4,6 +4,7 @@ from .forms import QuestionForm, EvaluateForm
 import requests, json, re, datetime
 from time import time
 import numpy as np
+from .tools import s3_upload
 
 """
 View functions:
@@ -273,6 +274,6 @@ def evaluateresult():
 
 	rounded_ratings = list(map(round_cap_rating, guessed_ratings))
 	print(rounded_ratings)
-
+	s3_upload(json.dumps({'total_rated':len(json.loads(session['result'])), 'avgs':avgs}))
 	return render_template('evaluateresults.html',
 	error=error, jokes = jokes_text, ratings=ratings, group=groups, guessed_ratings = rounded_ratings, form = form, good_avg=good_avg, bad_avg=bad_avg, median_avg=median_avg)

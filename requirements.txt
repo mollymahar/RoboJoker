@@ -13,3 +13,4 @@ nltk
 requests
 scipy
 sklearn
+boto
