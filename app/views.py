@@ -5,6 +5,7 @@ import requests, json, re, datetime
 from time import time
 import numpy as np
 from .tools import s3_upload
+import random
 
 """
 View functions:
@@ -73,50 +74,47 @@ def baseline():
 
 @myapp.route('/update', methods=['GET','POST'])
 def update():
+	page_orders = ['bee', 'fish', 'octopus']
+	random.shuffle(page_orders)
+
+	session['page_1'] = page_orders[0]
+	session['page_2'] = page_orders[1]
+	session['page_3'] = page_orders[2]
+
 	return render_template('update.html')
 
-@myapp.route('/recommendation', methods=['GET','POST'])
-def recommendation():
-	result = json.loads(session['result'])
-	error = None
+@myapp.route('/page_1', methods=['GET', 'POST'])
+def page_1():
+	joke_getter = get_joke_getter(session['page_1'])
+	current_html_page = session['page_1'] + '.html'
+	next_html_handler = '/page_2'
+	return recommended_jokes(joke_getter, current_html_page, next_html_handler)
 
-	# TODO: Update in the future if anything changes
-	jokes_idx, jokes_text, guessed_ratings = models.get_top_five_jokes(result)
+@myapp.route('/page_2', methods=['GET', 'POST'])
+def page_2():
+	joke_getter = get_joke_getter(session['page_2'])
+	current_html_page = session['page_2'] + '.html'
+	next_html_handler = '/page_3'
+	return recommended_jokes(joke_getter, current_html_page, next_html_handler)
 
-	if jokes_idx is None:
-		error = 'This is embarrassing - we are having some backend issues at the moment, please check back later'
+@myapp.route('/page_3', methods=['GET', 'POST'])
+def page_3():
+	joke_getter = get_joke_getter(session['page_3'])
+	current_html_page = session['page_3'] + '.html'
+	next_html_handler = '/completion'
+	return recommended_jokes(joke_getter, current_html_page, next_html_handler)
 
-	form = QuestionForm()
+def get_joke_getter(page_type):
+	joke_getter = None
+	if page_type == 'bee':
+		joke_getter = models.get_good_jokes
+	elif page_type == 'fish':
+		joke_getter = models.get_median_jokes
+	else:
+		joke_getter = models.get_bad_jokes
+	return joke_getter
 
-	if form.validate_on_submit():
-		# get user ratings from form data
-		ratings = [field.data for field in form]
-		# first field is CSRF field - remove that from the output
-		ratings = ratings[1:]
-
-		if all(rating == 'None' for rating in ratings):
-			error = 'Please rate at least 1 joke before proceeding!'
-			return render_template('recommendation.html',
-			error=error, jokes = jokes_text, ratings = guessed_ratings, form = form)
-
-		# result: a dictionary of joke ID: user rating so far
-		for i in range(len(ratings)):
-			result[str(jokes_idx[i])] = ratings[i]
-
-		session['result'] = json.dumps(result)
-
-		# writing user's response into json file
-		filename = session['filename']
-		models.write_response_to_json(filename, result)
-
-		# TODO: some dark ML magic should happen here!
-		return redirect('/recommendation')
-
-	return render_template('recommendation.html',
-	error=error, jokes = jokes_text, ratings = guessed_ratings, form = form)
-
-
-def recommended_jokes(joke_getter):
+def recommended_jokes(joke_getter, current_html_page, next_html_handler):
 	result = json.loads(session['result'])
 	error = None
 
@@ -136,7 +134,7 @@ def recommended_jokes(joke_getter):
 
 		if all(rating == 'None' for rating in ratings):
 			error = 'Please rate at least 1 joke before proceeding!'
-			return render_template('recommendation.html',
+			return render_template(current_html_page,
 			error=error, jokes = jokes_text, ratings = guessed_ratings, form = form)
 
 		# result: a dictionary of joke ID: user rating so far
@@ -150,9 +148,9 @@ def recommended_jokes(joke_getter):
 		models.write_response_to_json(filename, result)
 
 		# TODO: some dark ML magic should happen here!
-		return redirect('/recommendation')
+		return redirect(next_html_handler)
 
-	return render_template('recommendation.html',
+	return render_template(current_html_page,
 	error=error, jokes = jokes_text, ratings = guessed_ratings, form = form)
 
 @myapp.route('/goodjokes', methods=['GET','POST'])
@@ -277,3 +275,52 @@ def evaluateresult():
 	s3_upload(json.dumps({'total_rated':len(json.loads(session['result'])), 'avgs':avgs}))
 	return render_template('evaluateresults.html',
 	error=error, jokes = jokes_text, ratings=ratings, group=groups, guessed_ratings = rounded_ratings, form = form, good_avg=good_avg, bad_avg=bad_avg, median_avg=median_avg)
+
+@myapp.route('/completion', methods=['GET','POST'])
+def completion():
+	return render_template('completion.html')
+
+# @myapp.route('/results', methods=['GET','POST'])
+# def results():
+# 	result = json.loads(session['result'])
+# 	return render_template('results.html', result = result)
+
+# @myapp.route('/recommendation', methods=['GET','POST'])
+# def recommendation():
+# 	result = json.loads(session['result'])
+# 	error = None
+#
+# 	# TODO: Update in the future if anything changes
+# 	jokes_idx, jokes_text, guessed_ratings = models.get_top_five_jokes(result)
+#
+# 	if jokes_idx is None:
+# 		error = 'This is embarrassing - we are having some backend issues at the moment, please check back later'
+#
+# 	form = QuestionForm()
+#
+# 	if form.validate_on_submit():
+# 		# get user ratings from form data
+# 		ratings = [field.data for field in form]
+# 		# first field is CSRF field - remove that from the output
+# 		ratings = ratings[1:]
+#
+# 		if all(rating == 'None' for rating in ratings):
+# 			error = 'Please rate at least 1 joke before proceeding!'
+# 			return render_template('recommendation.html',
+# 			error=error, jokes = jokes_text, ratings = guessed_ratings, form = form)
+#
+# 		# result: a dictionary of joke ID: user rating so far
+# 		for i in range(len(ratings)):
+# 			result[str(jokes_idx[i])] = ratings[i]
+#
+# 		session['result'] = json.dumps(result)
+#
+# 		# writing user's response into json file
+# 		filename = session['filename']
+# 		models.write_response_to_json(filename, result)
+#
+# 		# TODO: some dark ML magic should happen here!
+# 		return redirect('/recommendation')
+#
+# 	return render_template('recommendation.html',
+# 	error=error, jokes = jokes_text, ratings = guessed_ratings, form = form)

@@ -1,4 +1,7 @@
 {% extends 'base.html' %}
+{% block navbar %}
+&#x1F41D;
+{% endblock %}
 
 {% block content %}
 <div class="site-wrapper-inner-not-centered">
@@ -33,24 +36,15 @@
             </tr>
             {% endfor %}
             <br><br>
-            <!-- <p><a href="#" data-toggle="collapse" data-target="#demo" class="small">Click here to reveal what we thought you'd rate this joke.</a></p> -->
-            <!--the id's for each of these will need to come from Flask, so this will need to be updated -->
-            <!-- <div id="demo" class="collapse">
-                <p>&#9733; &#9733; &#9733; &#9733; (Replace with actual prediction)</p>
-            </div> -->
 
             {% endif %}
             <hr color="gray">
             {% endfor %}
 
-            <p><input type="submit" value="More Jokes!" class="btn btn-md btn-secondary nextjoke"></p>
-        <!-- Here is what should replace the input value above in the three set version:
+            <p>
+            <input type="submit" value="Next" class="btn btn-lg btn-secondary">
+            </p>
             <br>
-            <p class="lead">Thanks for rating! Which joke set do you want to see next?</p>
-            <a href="{{ url_for('recommendation')}}" class="btn btn-lg btn-secondary">&#x1F420</a>
-            <a href="{{ url_for('recommendation')}}" class="btn btn-lg btn-secondary">&#x1F41D</a>
-            <a href="{{ url_for('recommendation')}}" class="btn btn-lg btn-secondary">&#x1F419</a>
-        -->
         </form>
     </div>
 </div>
