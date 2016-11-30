@@ -267,6 +267,8 @@ def evaluateresult():
 	def round_cap_rating(rating):
 		if rating > 5:
 			return '5.0'
+		elif rating < 0:
+			return '1.0'
 		else:
 			return "{0:.2f}".format(rating)
 
