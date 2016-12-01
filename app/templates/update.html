@@ -5,9 +5,19 @@
     <div class="col s12">
         <h1 class="cover-heading">We're feeding your responses into our super-secret algorithm...</h1>
         <br>
-        <p class="lead">We have created three sets of five jokes, each a little bit different. Let's check them out!</p>
+
+        {% if next_page == 'page_1' %}
+        <p class="lead">
+            We have created three sets of five jokes, each a little bit different. Let's check them out!
+        </p>
+        {% else %}
+        <p class="lead">
+            We have got some additional jokes for you to evaluate. Enjoy!
+        </p>
+        {% endif %}
+
         <br>
-        <a href="{{ url_for('page_1')}}" class="btn btn-lg btn-secondary">Next</a>
+        <a href="{{ url_for(next_page)}}" class="btn btn-lg btn-secondary">Next</a>
     </div>
 </div>
 {% endblock %}

@@ -76,9 +76,6 @@ def guess_ratings(indices, ratings, joke_features):
     y_pred -= np.mean(y_pred)
     y_pred *= 1.0/np.std(y_pred)
     y_pred += 2.5
-    # y_pred = y_pred.round()
-    # y_pred[np.where(y_pred > 5)] = 5
-    # y_pred[np.where(y_pred < 1)] = 1
     return y_pred
 
 def write_response_to_json(filename, ratings_dict):
@@ -158,12 +155,7 @@ def get_n_jokes(ratings_dict, n, min_index, max_index):
             top_five_idx += [joke_index]
             top_five_txt += [all_jokes[joke_index]]
             top_five_rating += [guesses[joke_index]]
-
-
-
-    # print(top_five_idx)
-    # print(top_five_txt)
-    # print(top_five_rating)
+            
     return top_five_idx, top_five_txt, top_five_rating
 
 def get_good_jokes(ratings_dict):
