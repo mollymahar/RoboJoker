@@ -89,6 +89,7 @@ def update():
 
 		next_page = 'page_1'
 	else:
+		session['reload'] = 'true'
 		next_page = 'evaluate'
 
 	return render_template('update.html', next_page = next_page)
@@ -186,24 +187,38 @@ def evaluate():
 	# shuffle them in random order, variable evaluate_key keeps track of
 	# which jokes are which
 	# ====================
-	models_list = [models.get_good_jokes(result), models.get_median_jokes(result), models.get_bad_jokes(result)]
-	jokes_idx, jokes_text, guessed_ratings = [], [], []
-	for model in models_list:
-		jokes_idx += model[0]
-		jokes_text += model[1]
-		guessed_ratings += model[2]
+	if session['reload'] == 'true':
+		models_list = [models.get_good_jokes(result), models.get_median_jokes(result), models.get_bad_jokes(result)]
+		jokes_idx, jokes_text, guessed_ratings = [], [], []
+		for model in models_list:
+			jokes_idx += model[0]
+			jokes_text += model[1]
+			guessed_ratings += model[2]
 
-	# shuffle the list of jokes
-	shuffling_orders = np.arange(15)
-	np.random.shuffle(shuffling_orders)
+		# shuffle the list of jokes
+		shuffling_orders = np.arange(15)
+		np.random.shuffle(shuffling_orders)
 
-	# evaluate_key tells you which jokes are good(1), bad(-1),
-	# or random(0) in the newly shuffled list
-	evaluate_key = (shuffling_orders < 5).astype(int) + -1*(shuffling_orders > 9).astype(int)
-	jokes_idx, jokes_text, guessed_ratings = shuffle_jokes(shuffling_orders, jokes_idx, jokes_text, guessed_ratings)
+		# evaluate_key tells you which jokes are good(1), bad(-1),
+		# or random(0) in the newly shuffled list
+		evaluate_key = (shuffling_orders < 5).astype(int) + -1*(shuffling_orders > 9).astype(int)
+		jokes_idx, jokes_text, guessed_ratings = shuffle_jokes(shuffling_orders, jokes_idx, jokes_text, guessed_ratings)
 
-	if len(jokes_idx) == 0:
-		error = 'This is embarrassing - we are having some backend issues at the moment, please check back later'
+		session['reload'] = 'false'
+		session['currentjokes'] = json.dumps({
+		'jokes_idx':jokes_idx,
+		'jokes_text':jokes_text,
+		'guessed_ratings':guessed_ratings,
+		'evaluate_key':np.array(evaluate_key).tolist()})
+
+		if len(jokes_idx) == 0:
+			error = 'This is embarrassing - we are having some backend issues at the moment, please check back later'
+	else:
+		current_jokes = json.loads(session['currentjokes'])
+		jokes_idx = current_jokes['jokes_idx']
+		jokes_text = current_jokes['jokes_text']
+		guessed_ratings = current_jokes['guessed_ratings']
+		evaluate_key = current_jokes['evaluate_key']
 
 	# ====================
 	# get user evaluation input
@@ -251,6 +266,7 @@ def evaluate():
 		models.write_response_to_json(filename, result)
 
 		if request.form['submit'] == 'Gimme More':
+			session['reload'] = 'true'
 			return redirect('/evaluate')
 		elif request.form['submit'] == 'I\'m Done':
 			return redirect('evaluateresults')
