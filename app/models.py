@@ -46,6 +46,7 @@ def load_jokes():
     if ALL_JOKES is None:
         if not os.path.isfile('combined_jokes.csv'):
             create_combined_jokes_file()
+        # ALL_JOKES = pd.read_csv('combined_jokes.csv', sep = ',', index_col = 0).drop_duplicates(subset=['text'])
         ALL_JOKES = pd.read_csv('combined_jokes.csv', sep = ',', index_col = 0)
     return ALL_JOKES
 
@@ -125,6 +126,8 @@ def get_top_five_jokes(ratings_dict):
 def get_n_jokes(ratings_dict, n, min_index, max_index):
     all_jokes = load_jokes()['text']
     all_latent_topics = load_latent_topics()
+
+    # print('num jokes:', all_jokes.shape, ', number of latent_topics: ', all_latent_topics.shape)
     if all_latent_topics is None:
         return None, None, None
 
@@ -155,7 +158,7 @@ def get_n_jokes(ratings_dict, n, min_index, max_index):
             top_five_idx += [joke_index]
             top_five_txt += [all_jokes[joke_index]]
             top_five_rating += [guesses[joke_index]]
-            
+
     return top_five_idx, top_five_txt, top_five_rating
 
 def get_good_jokes(ratings_dict):
