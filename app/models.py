@@ -11,6 +11,8 @@ import json
 ALL_JOKES = None
 PRINT_VERBOSE = True
 ALL_LATENT_TOPICS = None
+jokes_text_filename = 'combined_jokes_unique.csv'
+features_filename = 'combined_features_unique.npy'
 
 # utility print
 def cprint(s):
@@ -36,7 +38,9 @@ def create_combined_jokes_file():
     NUM_JOKES = jokes_data.shape[0]
 
     jokes = jokes_data[['text', 'type', 'tags', 'rating', 'num_ratings', 'link']]
-    jokes.to_csv('combined_jokes.csv', index_label='ID')
+    unique_jokes = raw_jokes.drop_duplicates(subset=['text'])
+    unique_jokes.reset_index(inplace = True)
+    unique_jokes.to_csv(jokes_text_filename, index_label='ID')
 
     return True
 
@@ -44,17 +48,16 @@ def create_combined_jokes_file():
 def load_jokes():
     global ALL_JOKES
     if ALL_JOKES is None:
-        if not os.path.isfile('combined_jokes.csv'):
+        if not os.path.isfile(jokes_text_filename):
             create_combined_jokes_file()
-        # ALL_JOKES = pd.read_csv('combined_jokes.csv', sep = ',', index_col = 0).drop_duplicates(subset=['text'])
-        ALL_JOKES = pd.read_csv('combined_jokes.csv', sep = ',', index_col = 0)
+        ALL_JOKES = pd.read_csv(jokes_text_filename, sep = ',', index_col = 0)
     return ALL_JOKES
 
 def load_latent_topics():
     global ALL_LATENT_TOPICS
     if ALL_LATENT_TOPICS is None:
         try:
-            ALL_LATENT_TOPICS = np.load('combined_features.npy')
+            ALL_LATENT_TOPICS = np.load(features_filename)
             print('successfully loaded latent topics for jokes from file')
             return ALL_LATENT_TOPICS
         except:
