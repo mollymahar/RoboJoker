@@ -189,10 +189,9 @@ def evaluate():
     # ====================
     if session['reload'] == 'true':
         models_list = [models.get_good_jokes(result), models.get_median_jokes(result), models.get_bad_jokes(result)]
-        jokes_idx, jokes_text, guessed_ratings = [], [], []
+        jokes_idx, guessed_ratings = [], []
         for model in models_list:
             jokes_idx += model[0]
-            jokes_text += model[1]
             guessed_ratings += model[2]
 
         # shuffle the list of jokes
@@ -202,12 +201,11 @@ def evaluate():
         # evaluate_key tells you which jokes are good(1), bad(-1),
         # or random(0) in the newly shuffled list
         evaluate_key = (shuffling_orders < 5).astype(int) + -1*(shuffling_orders > 9).astype(int)
-        jokes_idx, jokes_text, guessed_ratings = shuffle_jokes(shuffling_orders, jokes_idx, jokes_text, guessed_ratings)
+        jokes_idx, guessed_ratings = shuffle_jokes(shuffling_orders, jokes_idx, guessed_ratings)
 
         session['reload'] = 'false'
         session['currentjokes'] = json.dumps({
         'jokes_idx':jokes_idx,
-        'jokes_text':jokes_text,
         'guessed_ratings':guessed_ratings,
         'evaluate_key':np.array(evaluate_key).tolist()})
 
@@ -216,9 +214,12 @@ def evaluate():
     else:
         current_jokes = json.loads(session['currentjokes'])
         jokes_idx = current_jokes['jokes_idx']
-        jokes_text = current_jokes['jokes_text']
         guessed_ratings = current_jokes['guessed_ratings']
         evaluate_key = current_jokes['evaluate_key']
+
+    # get jokes text based on indices
+    # dynamically loading jokes to avoid overflow issue with caching them
+    jokes_text = models.get_jokes(jokes_idx)
 
     # ====================
     # get user evaluation input
@@ -238,16 +239,15 @@ def evaluate():
         # result: a dictionary of joke ID: user rating so far
         # if 'evaluateresults' in session:
         #      evaluate_results = json.loads(session['evaluateresults'])
-        #      p_jokes_idx, p_jokes_text, p_guessed_ratings, p_ratings, p_evaluate_key = get_past_eval_results(evaluate_results)
+        #      p_jokes_idx, p_guessed_ratings, p_ratings, p_evaluate_key = get_past_eval_results(evaluate_results)
         # else:
         evaluate_results = dict()
-        p_jokes_idx, p_jokes_text, p_guessed_ratings, p_ratings, p_evaluate_key = [], [], [], [], []
+        p_jokes_idx, p_guessed_ratings, p_ratings, p_evaluate_key = [], [], [], []
 
         for i in range(len(ratings)):
             if ratings[i] != 'None':
                 result[str(jokes_idx[i])] = ratings[i]
                 p_jokes_idx.append(jokes_idx[i])
-                p_jokes_text.append(jokes_text[i])
                 p_guessed_ratings.append(guessed_ratings[i])
                 p_ratings.append(ratings[i])
                 p_evaluate_key.append(evaluate_key[i])
@@ -256,7 +256,6 @@ def evaluate():
         session['result'] = json.dumps(result)
         session['evaluateresults'] = json.dumps({
         'jokes_idx':p_jokes_idx,
-        'jokes_text':p_jokes_text,
         'guessed_ratings':p_guessed_ratings,
         'ratings':p_ratings,
         'evaluate_key':np.array(p_evaluate_key).tolist()})
@@ -280,7 +279,7 @@ def evaluateresult():
     evaluate_results = json.loads(session['evaluateresults'])
     error = None
 
-    jokes_idx, jokes_text, guessed_ratings, ratings, evaluate_key = get_past_eval_results(evaluate_results)
+    jokes_idx, guessed_ratings, ratings, evaluate_key = get_past_eval_results(evaluate_results)
 
     if len(jokes_idx) == 0:
         error = 'This is embarrassing - we are having some backend issues at the moment, please check back later'
@@ -296,12 +295,16 @@ def evaluateresult():
     # round raw guessed ratings for display
     rounded_ratings = list(map(round_cap_rating, guessed_ratings))
 
-    print('user ratings: ', ratings)
+    # get jokes text for display
+    jokes_text = models.get_jokes(jokes_idx)
 
     user_submission = {
     'total_rated':len(ratings),
     'avgs':avgs,
-    'evaluate_results': evaluate_results,
+    'jokes index': jokes_idx,
+    'jokes text': jokes_text,
+    'guessed ratings': guessed_ratings,
+    'actual ratings': ratings,
     'baseline_result': json.loads(session['baseline_result'])
     }
 
@@ -318,22 +321,20 @@ def evaluateresult():
 
 # HELPER FUNCTIONS
 # return shuffled jokes given the shuffling order
-def shuffle_jokes(shuffling_orders, indices, texts, ratings):
-    shuffled_indices, shuffled_texts, shuffled_ratings = [], [], []
+def shuffle_jokes(shuffling_orders, indices, ratings):
+    shuffled_indices, shuffled_ratings = [], []
     for index in shuffling_orders:
         shuffled_indices.append(int(indices[index]))
-        shuffled_texts.append(texts[index])
         shuffled_ratings.append(ratings[index])
-    return shuffled_indices, shuffled_texts, shuffled_ratings
+    return shuffled_indices, shuffled_ratings
 
 # get the existing evaluation result so we can append more in the infinite looping
 def get_past_eval_results(evaluate_results):
     p_jokes_idx = evaluate_results['jokes_idx']
-    p_jokes_text = evaluate_results['jokes_text']
     p_guessed_ratings = evaluate_results['guessed_ratings']
     p_ratings = evaluate_results['ratings']
     p_evaluate_key = evaluate_results['evaluate_key']
-    return p_jokes_idx, p_jokes_text, p_guessed_ratings, p_ratings, p_evaluate_key
+    return p_jokes_idx, p_guessed_ratings, p_ratings, p_evaluate_key
 
 # calculate label averages
 def avg_ratings_by_labels(ratings, labels):

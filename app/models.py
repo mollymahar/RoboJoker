@@ -153,7 +153,7 @@ def get_n_jokes(ratings_dict, n, min_index, max_index):
 
     while len(top_five_idx) < n:
         pos = random.randint(min_index, max_index)
-        print(pos)
+        # print(pos)
         joke_index = joke_rankings[pos]
 
         if joke_index not in indices and joke_index not in top_five_idx:
@@ -163,6 +163,11 @@ def get_n_jokes(ratings_dict, n, min_index, max_index):
             top_five_rating += [guesses[joke_index]]
 
     return top_five_idx, top_five_txt, top_five_rating
+
+def get_jokes(indices):
+    all_jokes = load_jokes()['text']
+    jokes_text = [all_jokes[int(i)] for i in indices]
+    return jokes_text
 
 def get_good_jokes(ratings_dict):
     return get_n_jokes(ratings_dict, 5, -200, -1)
