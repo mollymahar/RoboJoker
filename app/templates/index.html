@@ -19,10 +19,14 @@
     <br>
     <a href="{{ url_for('baseline') }}" class="btn btn-lg btn-secondary">Let's begin!</a>
 
+    <br><br> Or you can tell us a joke and we'll try to tell you similar ones in our database.
+    <br><br><a href="{{ url_for('similarity') }}" class="btn btn-lg btn-secondary">Similar Joke Finder</a>
+
     {% else %}
     <a href="{{ url_for(next_page)}}" class="btn btn-lg btn-secondary">Evaluate more jokes</a>
     <br><br><a href="{{ url_for('funny_jokes') }}" class="btn btn-lg btn-secondary">Gimme some funny jokes!</a>
     <br><br><a href="{{ url_for('clear_session') }}" class="btn btn-lg btn-secondary">Start a new session!</a>
+    <br><br><a href="{{ url_for('similarity') }}" class="btn btn-lg btn-secondary">Similar Joke Finder</a>
 
     {% endif%}
     <br><br>
