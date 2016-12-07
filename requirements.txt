@@ -14,3 +14,4 @@ requests
 scipy
 sklearn
 boto
+gensim
