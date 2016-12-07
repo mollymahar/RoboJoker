@@ -4,11 +4,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <body>
-    <h1>Enter a joke here and we will try to find the most similar jokes</h1>
+    <h2>Enter a joke here and we'll find similar jokes from our collection:</h2>
+    <br><br>
     <form action="/similarity" method="POST">
-        <textarea rows="10" cols="30" style="width:400px;height:400px;font-size:14pt;color: black;" name="text" id='similarityfield'>{{joke}}</textarea>
-        <br><input type="submit" name="submit" value="Submit" class="btn btn-md btn-secondary nextjoke">
-        <br><input type="submit" name="random" value="Random" class="btn btn-md btn-secondary nextjoke">
+        <textarea rows="10" cols="30" style="width:400px;height:200px;font-size:14pt;color: black;" name="text" id='similarityfield'>{{joke}}</textarea>
+        <br><input type="submit" name="random" value="I don't know any jokes. Fill in a random one for me." class="btn btn-sm btn-secondary nextjoke">
+        <br><input type="submit" name="submit" value="Submit" class="btn btn-lg btn-secondary nextjoke">
+
 
     </form>
 </body>
