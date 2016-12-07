@@ -94,42 +94,6 @@ def guess_ratings(indices, ratings, joke_features):
 #         json.dump(ratings_dict, outfile, separators=(',', ':'))
 
 # get top five jokes
-# def get_top_five_jokes(ratings_dict):
-#     all_jokes = load_jokes()['text']
-#     all_latent_topics = load_latent_topics()
-#     if all_latent_topics is None:
-#         return None, None, None
-#
-#     rating_tuples = list(ratings_dict.items())
-#     indices = []
-#     ratings = []
-#     for rating in rating_tuples:
-#         if rating[1] == 'None':
-#             pass
-#         else:
-#             indices += [int(rating[0])]
-#             ratings += [int(rating[1])]
-#
-#     indices, ratings = np.asarray(indices), np.asarray(ratings)
-#     guesses = guess_ratings(indices, ratings, all_latent_topics)
-#
-#     top_five_idx, top_five_txt, top_five_rating = [], [], []
-#
-#     joke_rankings = np.argsort(guesses)
-#
-#     while len(top_five_idx) < 5:
-#         pos = random.randint(-200, -1)
-#         joke_index = joke_rankings[pos]
-#
-#         if joke_index not in indices and joke_index not in top_five_idx:
-#             joke_index = joke_rankings[pos]
-#             top_five_idx += [joke_index]
-#             top_five_txt += [all_jokes[joke_index]]
-#             top_five_rating += [guesses[joke_index]]
-#
-#     return top_five_idx, top_five_txt, top_five_rating
-
-# get top five jokes
 def get_n_jokes(ratings_dict, n, min_index, max_index):
     all_jokes = load_jokes()['text']
     all_latent_topics = load_latent_topics()
@@ -226,4 +190,3 @@ def indices_of_similar(joke):
     # print(u'SIMILAR/DISSIMILAR DOCS PER MODEL %s:\n' % model)
     # for label, index in [('MOST', 2), ('MEDIAN', len(sims)//2), ('LEAST', len(sims) - 1)]:
         # print(u'%s %s: «%s»\n' % (label, sims[index], ' '.join(alldocs[sims[index][0]].words)))
-

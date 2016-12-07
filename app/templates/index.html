@@ -6,27 +6,47 @@
 
     {% if rated_baseline == 'False' %}
 
-    <p class="lead">Thanks for exploring humor with us! Here's what's going to happen:</p>
-    <ol>
-        <li>We will present you with 20 jokes, five at a time.</li>
-        <li>For each joke, you'll give us a rating of how good you think the joke is.</li>
-        <li>We'll feed those ratings into our super-secret algorithm.</li>
-        <li>Then we'll present you with three new sets of five jokes, and we'll have you rate those, too.</li>
-    </ol>
-    <p>
-        And that's about it!
-    </p>
+    <p class="lead">Thanks for exploring humor with us! We have two options for you: </p>
     <br>
-    <a href="{{ url_for('baseline') }}" class="btn btn-lg btn-secondary">Let's begin!</a>
-
-    <br><br> Or you can tell us a joke and we'll try to tell you similar ones in our database.
-    <br><br><a href="{{ url_for('similarity') }}" class="btn btn-lg btn-secondary">Similar Joke Finder</a>
+    <div>
+        <p class="lead">Option 1: Joke Evaluation</p>
+        <ol>
+            <li>We will present you with 20 jokes, five at a time.</li>
+            <li>For each joke, you'll give us a rating of how good you think the joke is.</li>
+            <li>We'll feed those ratings into our super-secret algorithm.</li>
+            <li>Then we'll present you with some personalized joke recommendation, and we'll have you rate those, too.</li>
+        </ol>
+        <p>
+            And that's about it!
+        </p>
+        <br>
+        <a href="{{ url_for('baseline') }}" class="btn btn-lg btn-secondary">Let's begin!</a>
+    </div>
+    <div>
+        <br><br>
+        <p class="lead">Option 2: Joke Exploration</p>
+        <br>
+        <p>
+            Tell us a joke and we'll try to tell you similar ones in our database.
+        </p><br>
+        <a href="{{ url_for('similarity') }}" class="btn btn-lg btn-secondary">Similar Joke Finder</a>
+    </div>
 
     {% else %}
-    <a href="{{ url_for(next_page)}}" class="btn btn-lg btn-secondary">Evaluate more jokes</a>
-    <br><br><a href="{{ url_for('funny_jokes') }}" class="btn btn-lg btn-secondary">Gimme some funny jokes!</a>
-    <br><br><a href="{{ url_for('clear_session') }}" class="btn btn-lg btn-secondary">Start a new session!</a>
-    <br><br><a href="{{ url_for('similarity') }}" class="btn btn-lg btn-secondary">Similar Joke Finder</a>
+
+    <div>
+        <a href="{{ url_for(next_page)}}" class="btn btn-lg btn-secondary">Evaluate more jokes</a>
+        <br><br>
+        <a href="{{ url_for('funny_jokes') }}" class="btn btn-lg btn-secondary">Gimme some funny jokes!</a>
+        <br><br>
+        <a href="{{ url_for('similarity') }}" class="btn btn-lg btn-secondary">Similar Joke Finder</a>
+
+        <br> <br>
+        <hr color="gray">
+        <br><br>
+        <a href="{{ url_for('clear_session') }}" class="btn btn-lg btn-secondary">Start a new session!</a>
+
+    </div>
 
     {% endif%}
     <br><br>
@@ -40,7 +60,6 @@
         <h6>
             RoboJoker is a joke recommendation engine, part of a class project for natural language processing at UC Berkeley. Joke text was sourced from Comedy Central (jokes.cc.com), OneLineFun.com, and Reddit.
         </h6>
-        <!-- TODO: Add additional disclaimer for offensive jokes -->
     </div>
 </div>
 

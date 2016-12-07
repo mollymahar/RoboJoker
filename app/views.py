@@ -24,8 +24,9 @@ def index():
     # session.pop('baseline_result', None)
 
     next_page = 'page_1' if RANDOM_ANIMAL_PAGE else 'evaluate'
-
     rated_baseline = 'False' if 'baseline_result' not in session else 'True'
+    session['reload'] = 'True'
+
     return render_template('index.html', rated_baseline = rated_baseline, next_page = next_page)
 
 @myapp.route('/clearsession')
@@ -37,9 +38,18 @@ def clear_session():
 @myapp.route('/baseline', methods=['GET','POST'])
 def baseline():
 
-    jokes_df = models.get_random_jokes(20, random_state=256)
-    jokes_idx = list(jokes_df.index)
-    jokes_text = list(jokes_df['text'])
+    if session['reload'] == 'True':
+        # jokes_df = models.get_random_jokes(20, random_state=256)
+        jokes_df = models.get_random_jokes(20)
+        jokes_idx = list(jokes_df.index)
+        jokes_idx = [str(i) for i in jokes_idx]
+        jokes_text = list(jokes_df['text'])
+        session['baselinejokes'] = json.dumps({'index': jokes_idx, 'hello': 'hello'})
+    else:
+        jokes_idx = json.loads(session['baselinejokes'])['index']
+        jokes_text = models.get_jokes(jokes_idx)
+
+    session['reload'] = 'False'
 
     # page: the current page/stage for the baseline, can be [1,2,3,4]
     page = 1 if 'page' not in session else int(session['page'])
@@ -54,7 +64,7 @@ def baseline():
         # first field is CSRF field - remove that from the output
         ratings = ratings[1:]
 
-        if any(rating == 'None' for rating in ratings):
+        if all(rating == 'None' for rating in ratings):
             error = 'Please rate all jokes before proceeding!'
             return render_template('baseline.html',
             jokes = jokes_text[offset:offset + 5], offset = offset, form = form, error = error)
@@ -99,7 +109,7 @@ def update():
         next_page = 'page_1'
 
     else:
-        session['reload'] = 'true'
+        session['reload'] = 'True'
         next_page = 'evaluate'
 
     return render_template('update.html', next_page = next_page)
@@ -197,7 +207,7 @@ def evaluate():
     # shuffle them in random order, variable evaluate_key keeps track of
     # which jokes are which
     # ====================
-    if session['reload'] == 'true':
+    if session['reload'] == 'True':
         models_list = [models.get_good_jokes(result), models.get_median_jokes(result), models.get_bad_jokes(result)]
         jokes_idx, guessed_ratings = [], []
         for model in models_list:
@@ -213,7 +223,7 @@ def evaluate():
         evaluate_key = (shuffling_orders < 5).astype(int) + -1*(shuffling_orders > 9).astype(int)
         jokes_idx, guessed_ratings = shuffle_jokes(shuffling_orders, jokes_idx, guessed_ratings)
 
-        session['reload'] = 'false'
+        session['reload'] = 'False'
         session['currentjokes'] = json.dumps({
         'jokes_idx':jokes_idx,
         'guessed_ratings':guessed_ratings,
@@ -275,7 +285,7 @@ def evaluate():
         # models.write_response_to_json(filename, result)
 
         # if request.form['submit'] == 'Gimme More':
-        #     session['reload'] = 'true'
+        #     session['reload'] = 'True'
         #     return redirect('/evaluate')
         # elif request.form['submit'] == 'I\'m Done':
         return redirect('evaluateresults')
@@ -383,6 +393,30 @@ def funny_jokes():
     session['result'] = json.dumps(result)
     return render_template('funny.html', jokes = jokes_txt)
 
+@myapp.route('/similarity', methods=['GET','POST'])
+def similarity():
+	if request.method == 'POST':
+		if 'submit' in request.form:
+			text = request.form['text']
+			session['original_joke'] = text
+			session['similar_joke_indices'] = json.dumps(models.indices_of_similar(text))
+			return redirect('similarityresults')
+		elif 'random' in request.form:
+			session['random_joke'] = str(list(models.get_random_jokes(1)['text'])[0])
+			return redirect('similarity')
+
+	if 'random_joke' in session:
+		joke = session.pop('random_joke')
+	else:
+		joke = 'Why did the chicken cross the road? To get to the other side!'
+	return render_template("similarity.html", joke=joke)
+
+@myapp.route('/similarityresults', methods=['GET'])
+def similarity_results():
+	joke_texts = models.get_jokes(json.loads(session['similar_joke_indices']))
+	original_joke = session.pop('original_joke')
+	return render_template("similarityresults.html", original_joke=original_joke,joke_texts=joke_texts)
+
 ###########################################################
 
 # last page
@@ -398,32 +432,3 @@ def completion():
 def results():
     result = json.loads(session['result'])
     return render_template('results.html', result = result)
-
-@myapp.route('/similarity', methods=['GET','POST'])
-def similarity():
-	if request.method == 'POST':
-		print('in post')
-		if 'submit' in request.form:
-			print('in else')
-			text = request.form['text']
-			session['original_joke'] = text
-			session['similar_joke_indices'] = json.dumps(models.indices_of_similar(text))
-			return redirect('similarityresults')
-		elif 'random' in request.form:
-			print("did random")
-			print(list(models.get_random_jokes(1)['text']))
-			session['random_joke'] = str(list(models.get_random_jokes(1)['text'])[0])
-			return redirect('similarity')
-		
-
-	if 'random_joke' in session:
-		joke = session.pop('random_joke')
-	else:
-		joke = 'Why did the chicken cross the road? To get to the other side!'
-	return render_template("similarity.html", joke=joke)
-
-@myapp.route('/similarityresults', methods=['GET'])
-def similarity_results():
-	joke_texts = models.get_jokes(json.loads(session['similar_joke_indices']))
-	original_joke = session.pop('original_joke')
-	return render_template("similarityresults.html", original_joke=original_joke,joke_texts=joke_texts)
