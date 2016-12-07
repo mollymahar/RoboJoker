@@ -28,11 +28,16 @@ def index():
     rated_baseline = 'False' if 'baseline_result' not in session else 'True'
     return render_template('index.html', rated_baseline = rated_baseline, next_page = next_page)
 
+@myapp.route('/clearsession')
+def clear_session():
+	session.clear()
+	return redirect('/')
+
 # display some random jokes
 @myapp.route('/baseline', methods=['GET','POST'])
 def baseline():
 
-    jokes_df = models.get_random_jokes(20, random_state=88)
+    jokes_df = models.get_random_jokes(20)
     jokes_idx = list(jokes_df.index)
     jokes_text = list(jokes_df['text'])
 
