@@ -70,7 +70,7 @@ def baseline():
             if 'filename' not in session:
                 session['filename'] = 'responses/' + str(round(time())) + '.json'
             filename = session['filename']
-            models.write_response_to_json(filename, result)
+            # models.write_response_to_json(filename, result)
             return redirect('/update')
         else:
             session['page'] = str(page + 1)
@@ -168,7 +168,7 @@ def recommended_jokes(joke_getter, current_html_page, next_html_handler):
 
         # writing user's response into json file
         filename = session['filename']
-        models.write_response_to_json(filename, result)
+        # models.write_response_to_json(filename, result)
 
         return redirect(next_html_handler)
 
@@ -267,7 +267,7 @@ def evaluate():
 
         # writing user's response into json file
         filename = session['filename']
-        models.write_response_to_json(filename, result)
+        # models.write_response_to_json(filename, result)
 
         # if request.form['submit'] == 'Gimme More':
         #     session['reload'] = 'true'
@@ -317,7 +317,7 @@ def evaluateresult():
     s3_upload(json.dumps(user_submission))
 
     filename = session['filename']
-    models.write_response_to_json(filename, json.dumps(user_submission))
+    # models.write_response_to_json(filename, json.dumps(user_submission))
 
     return render_template('evaluateresults.html',
     error = error, jokes = jokes_text, ratings = ratings,
