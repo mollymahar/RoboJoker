@@ -183,9 +183,13 @@ def indices_of_similar(joke):
     sims = model.docvecs.most_similar([vector], topn=model.docvecs.count)  # get *all* similar documents
     # just take first element from generated pairs of indexes and scores
     sims = list(map(lambda x: int(x[0]), sims))
+    
+    if get_jokes([sims[0]])[0] == joke:
+        return sims[1:6]
+    else:
+        return sims[:5]
     # print(sims[:5])
     # print(get_jokes(sims[:4]))
-    return sims[:4]
     # print(u'TARGET: «%s»\n' % (sample_text))
     # print(u'SIMILAR/DISSIMILAR DOCS PER MODEL %s:\n' % model)
     # for label, index in [('MOST', 2), ('MEDIAN', len(sims)//2), ('LEAST', len(sims) - 1)]:
