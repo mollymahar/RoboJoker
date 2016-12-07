@@ -20,7 +20,10 @@
         <div class="site-wrapper-inner">
             <div class="masthead clearfix">
                 <div class="inner">
-                    <h3 class="masthead-brand">RoboJoker
+                    <h3 class="masthead-brand">
+                        <a href="{{ url_for('index') }}">
+                            RoboJoker
+                        </a>
                         {% block navbar %}{% endblock %}
                     </h3>
                 </div>

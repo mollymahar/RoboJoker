@@ -16,8 +16,15 @@
         </p>
         {% endif %}
 
-        <br>
-        <a href="{{ url_for(next_page)}}" class="btn btn-lg btn-secondary">Next</a>
+
+        <a href="{{ url_for(next_page)}}" class="btn btn-lg btn-secondary">Evaluate more jokes</a>
+
+        <br><br><br><br>
+        <p class="lead">
+            Alternatively, enjoy your hard earned personalized joke recommendation here!
+        </p>
+        <a href="{{ url_for('funny_jokes') }}" class="btn btn-lg btn-secondary">Gimme some funny jokes!</a>
+
     </div>
 </div>
 {% endblock %}

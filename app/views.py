@@ -19,9 +19,14 @@ RANDOM_ANIMAL_PAGE = False
 @myapp.route('/')
 @myapp.route('/index')
 def index():
-    session.pop('page', None)
-    session.pop('baseline_result', None)
-    return render_template('index.html')
+    # session.pop('page', None)
+    # we don't pop the baseline_result anymore since we need to use it for both evaluation and get good jokes
+    # session.pop('baseline_result', None)
+
+    next_page = 'page_1' if RANDOM_ANIMAL_PAGE else 'evaluate'
+
+    rated_baseline = 'False' if 'baseline_result' not in session else 'True'
+    return render_template('index.html', rated_baseline = rated_baseline, next_page = next_page)
 
 # display some random jokes
 @myapp.route('/baseline', methods=['GET','POST'])
@@ -58,15 +63,14 @@ def baseline():
 
         session['baseline_result'] = json.dumps(result)
 
-        # writing user's response into json file
-        if 'filename' not in session:
-            session['filename'] = 'responses/' + str(round(time())) + '.json'
-        filename = session['filename']
-        models.write_response_to_json(filename, result)
-
         # if reached last page, move onto next phase
         # otherwise increment page by 1
         if page == 4:
+            # writing user's response into json file
+            if 'filename' not in session:
+                session['filename'] = 'responses/' + str(round(time())) + '.json'
+            filename = session['filename']
+            models.write_response_to_json(filename, result)
             return redirect('/update')
         else:
             session['page'] = str(page + 1)
@@ -88,6 +92,7 @@ def update():
         session['page_3'] = page_orders[2]
 
         next_page = 'page_1'
+
     else:
         session['reload'] = 'true'
         next_page = 'evaluate'
@@ -358,9 +363,29 @@ def round_cap_rating(rating):
 
 ###########################################################
 
+"""
+Other fun things for people to play with
+"""
+@myapp.route('/funny_jokes', methods=['GET', 'POST'])
+def funny_jokes():
+    result = json.loads(session['result'])
+    jokes_idx, jokes_txt, jokes_rating = models.get_good_jokes(result)
+    if jokes_idx is None:
+        return render_template('completion.html')
+
+    for i in jokes_idx:
+        result[str(i)] = 'None'
+    session['result'] = json.dumps(result)
+    return render_template('funny.html', jokes = jokes_txt)
+
+###########################################################
+
 # last page
 @myapp.route('/completion', methods=['GET','POST'])
 def completion():
+    session.pop('page', None)
+    session.pop('baseline_result', None)
+    session.pop('result', None)
     return render_template('completion.html')
 
 # unused at the moment - good for cross-checking and validation

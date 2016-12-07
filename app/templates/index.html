@@ -1,29 +1,42 @@
 {% extends 'base.html' %}
 
 {% block content %}
-          <div class="inner cover">
-            <h1 class="cover-heading">Welcome to RoboJoker!</h1>
-            <p class="lead">Thanks for exploring humor with us! Here's what's going to happen:</p>
-            <ol>
-              <li>We will present you with 20 jokes, five at a time.</li>
-              <li>For each joke, you'll give us a rating of how good you think the joke is.</li>
-              <li>We'll feed those ratings into our super-secret algorithm.</li>
-              <li>Then we'll present you with three new sets of five jokes, and we'll have you rate those, too.</li>
-            </ol>
-            <p>And that's about it!</p><br>
-            <a href="{{ url_for('baseline') }}" class="btn btn-lg btn-secondary">Show me some jokes!</a>
-            </p>
-            <br>
-            <p>WARNING: Some jokes might be offensive. Sorry!</p>
-          </div>
+<div class="inner cover">
+    <h1 class="cover-heading">Welcome to RoboJoker!</h1>
 
-          <div class="mastfoot">
-            <div class="inner">
-              <h6>
-                  RoboJoker is a joke recommendation engine, part of a class project for natural language processing at UC Berkeley. Joke text was sourced from Comedy Central (jokes.cc.com), OneLineFun.com, and Reddit.
-              </h6>
-              <!-- TODO: Add additional disclaimer for offensive jokes -->
-            </div>
-          </div>
+    {% if rated_baseline == 'False' %}
+
+    <p class="lead">Thanks for exploring humor with us! Here's what's going to happen:</p>
+    <ol>
+        <li>We will present you with 20 jokes, five at a time.</li>
+        <li>For each joke, you'll give us a rating of how good you think the joke is.</li>
+        <li>We'll feed those ratings into our super-secret algorithm.</li>
+        <li>Then we'll present you with three new sets of five jokes, and we'll have you rate those, too.</li>
+    </ol>
+    <p>
+        And that's about it!
+    </p>
+    <br>
+    <a href="{{ url_for('baseline') }}" class="btn btn-lg btn-secondary">Let's begin!</a>
+
+    {% else %}
+    <a href="{{ url_for(next_page)}}" class="btn btn-lg btn-secondary">Evaluate more jokes</a>
+    <a href="{{ url_for('funny_jokes') }}" class="btn btn-lg btn-secondary">Gimme some funny jokes!</a>
+
+    {% endif%}
+    <br><br>
+    <p>
+        WARNING: Some jokes might be offensive. Sorry!
+    </p>
+</div>
+
+<div class="mastfoot">
+    <div class="inner">
+        <h6>
+            RoboJoker is a joke recommendation engine, part of a class project for natural language processing at UC Berkeley. Joke text was sourced from Comedy Central (jokes.cc.com), OneLineFun.com, and Reddit.
+        </h6>
+        <!-- TODO: Add additional disclaimer for offensive jokes -->
+    </div>
+</div>
 
 {% endblock %}

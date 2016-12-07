@@ -87,56 +87,67 @@ def write_response_to_json(filename, ratings_dict):
         json.dump(ratings_dict, outfile, separators=(',', ':'))
 
 # get top five jokes
-def get_top_five_jokes(ratings_dict):
-    all_jokes = load_jokes()['text']
-    all_latent_topics = load_latent_topics()
-    if all_latent_topics is None:
-        return None, None, None
-
-    rating_tuples = list(ratings_dict.items())
-    indices = []
-    ratings = []
-    for rating in rating_tuples:
-        if rating[1] == 'None':
-            pass
-        else:
-            indices += [int(rating[0])]
-            ratings += [int(rating[1])]
-
-    indices, ratings = np.asarray(indices), np.asarray(ratings)
-    guesses = guess_ratings(indices, ratings, all_latent_topics)
-
-    top_five_idx, top_five_txt, top_five_rating = [], [], []
-
-    joke_rankings = np.argsort(guesses)
-
-    while len(top_five_idx) < 5:
-        pos = random.randint(-200, -1)
-        joke_index = joke_rankings[pos]
-
-        if joke_index not in indices and joke_index not in top_five_idx:
-            joke_index = joke_rankings[pos]
-            top_five_idx += [joke_index]
-            top_five_txt += [all_jokes[joke_index]]
-            top_five_rating += [guesses[joke_index]]
-
-    # print(top_five_idx)
-    # print(top_five_txt)
-    # print(top_five_rating)
-    return top_five_idx, top_five_txt, top_five_rating
+# def get_top_five_jokes(ratings_dict):
+#     all_jokes = load_jokes()['text']
+#     all_latent_topics = load_latent_topics()
+#     if all_latent_topics is None:
+#         return None, None, None
+#
+#     rating_tuples = list(ratings_dict.items())
+#     indices = []
+#     ratings = []
+#     for rating in rating_tuples:
+#         if rating[1] == 'None':
+#             pass
+#         else:
+#             indices += [int(rating[0])]
+#             ratings += [int(rating[1])]
+#
+#     indices, ratings = np.asarray(indices), np.asarray(ratings)
+#     guesses = guess_ratings(indices, ratings, all_latent_topics)
+#
+#     top_five_idx, top_five_txt, top_five_rating = [], [], []
+#
+#     joke_rankings = np.argsort(guesses)
+#
+#     while len(top_five_idx) < 5:
+#         pos = random.randint(-200, -1)
+#         joke_index = joke_rankings[pos]
+#
+#         if joke_index not in indices and joke_index not in top_five_idx:
+#             joke_index = joke_rankings[pos]
+#             top_five_idx += [joke_index]
+#             top_five_txt += [all_jokes[joke_index]]
+#             top_five_rating += [guesses[joke_index]]
+#
+#     return top_five_idx, top_five_txt, top_five_rating
 
 # get top five jokes
 def get_n_jokes(ratings_dict, n, min_index, max_index):
     all_jokes = load_jokes()['text']
     all_latent_topics = load_latent_topics()
 
-    # print('num jokes:', all_jokes.shape, ', number of latent_topics: ', all_latent_topics.shape)
+    # if loading latent topics is unsuccessful, return None
     if all_latent_topics is None:
         return None, None, None
 
+    # dynamically increase the search range if we are running out of jokes
+    # if we exhausts all jokes, return None, None, None
+    num_seen = len(ratings_dict)
+    seen_jokes = set(int(i) for i in ratings_dict.keys())
+
+    while (max_index - min_index) < n + num_seen:
+        if np.sign(min_index) == 1:
+            max_index = max_index*2
+            if abs(min_index) > len(all_jokes):
+                return None, None, None
+        else:
+            min_index = min_index*2
+            if max_index >= len(all_jokes):
+                return None, None, None
+
     rating_tuples = list(ratings_dict.items())
-    indices = []
-    ratings = []
+    indices, ratings = [], []
     for rating in rating_tuples:
         if rating[1] == 'None':
             pass
@@ -156,7 +167,7 @@ def get_n_jokes(ratings_dict, n, min_index, max_index):
         # print(pos)
         joke_index = joke_rankings[pos]
 
-        if joke_index not in indices and joke_index not in top_five_idx:
+        if joke_index not in seen_jokes and joke_index not in top_five_idx:
             joke_index = joke_rankings[pos]
             top_five_idx += [joke_index]
             top_five_txt += [all_jokes[joke_index]]
@@ -170,7 +181,7 @@ def get_jokes(indices):
     return jokes_text
 
 def get_good_jokes(ratings_dict):
-    return get_n_jokes(ratings_dict, 5, -200, -1)
+    return get_n_jokes(ratings_dict, 5, -201, -1)
 
 def get_bad_jokes(ratings_dict):
     return get_n_jokes(ratings_dict, 5, 0, 200)

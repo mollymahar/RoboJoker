@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="site-wrapper-inner-not-centered">
+    {% if error %}
+    <p class="error">
+        <strong> Error:</strong>
+        {{ error }}
+    </p>
+    {% endif %}
+
+    {% for joke in jokes %}
+    Joke {{ loop.index }}
+    <br>
+
+    <p class="joke-text">{{ joke }}</p>
+    <hr color="gray">
+    {% endfor %}
+
+    <p>
+        <a href="{{ url_for('funny_jokes') }}" class="btn btn-lg btn-secondary">Gimme more funny jokes!</a>
+        <a href="{{ url_for('completion') }}" class="btn btn-lg btn-secondary">I'm done!</a>
+    </p>
+</div>
+{% endblock %}
