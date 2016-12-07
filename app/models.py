@@ -89,9 +89,9 @@ def guess_ratings(indices, ratings, joke_features):
     y_pred += 2.5
     return y_pred
 
-def write_response_to_json(filename, ratings_dict):
-    with open(filename, 'w') as outfile:
-        json.dump(ratings_dict, outfile, separators=(',', ':'))
+# def write_response_to_json(filename, ratings_dict):
+#     with open(filename, 'w') as outfile:
+#         json.dump(ratings_dict, outfile, separators=(',', ':'))
 
 # get top five jokes
 # def get_top_five_jokes(ratings_dict):

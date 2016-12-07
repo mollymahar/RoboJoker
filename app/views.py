@@ -37,7 +37,7 @@ def clear_session():
 @myapp.route('/baseline', methods=['GET','POST'])
 def baseline():
 
-    jokes_df = models.get_random_jokes(20)
+    jokes_df = models.get_random_jokes(20, random_state=256)
     jokes_idx = list(jokes_df.index)
     jokes_text = list(jokes_df['text'])
 
@@ -402,15 +402,28 @@ def results():
 @myapp.route('/similarity', methods=['GET','POST'])
 def similarity():
 	if request.method == 'POST':
-		text = request.form['text']
-		# processed_text = text.upper()
-		session['original_joke'] = text
-		session['similar_joke_indices'] = json.dumps(models.indices_of_similar(text))
-		return redirect('similarityresults')
-	return render_template("similarity.html")
+		print('in post')
+		if 'submit' in request.form:
+			print('in else')
+			text = request.form['text']
+			session['original_joke'] = text
+			session['similar_joke_indices'] = json.dumps(models.indices_of_similar(text))
+			return redirect('similarityresults')
+		elif 'random' in request.form:
+			print("did random")
+			print(list(models.get_random_jokes(1)['text']))
+			session['random_joke'] = str(list(models.get_random_jokes(1)['text'])[0])
+			return redirect('similarity')
+		
+
+	if 'random_joke' in session:
+		joke = session.pop('random_joke')
+	else:
+		joke = 'Why did the chicken cross the road? To get to the other side!'
+	return render_template("similarity.html", joke=joke)
 
 @myapp.route('/similarityresults', methods=['GET'])
 def similarity_results():
 	joke_texts = models.get_jokes(json.loads(session['similar_joke_indices']))
-	original_joke = session['original_joke']
+	original_joke = session.pop('original_joke')
 	return render_template("similarityresults.html", original_joke=original_joke,joke_texts=joke_texts)

@@ -6,8 +6,10 @@
 <body>
     <h1>Enter a joke here and we will try to find the most similar jokes</h1>
     <form action="/similarity" method="POST">
-        <textarea rows="10" cols="30" style="width:300px;height:200px;font-size:14pt;color: black;" name="text" id='similarityfield'>Why did the chicken cross the road? To get to the other side!</textarea>
+        <textarea rows="10" cols="30" style="width:400px;height:400px;font-size:14pt;color: black;" name="text" id='similarityfield'>{{joke}}</textarea>
         <br><input type="submit" name="submit" value="Submit" class="btn btn-md btn-secondary nextjoke">
+        <br><input type="submit" name="random" value="Random" class="btn btn-md btn-secondary nextjoke">
+
     </form>
 </body>
 </html>
