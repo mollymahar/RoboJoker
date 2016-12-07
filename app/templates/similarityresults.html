@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<body>
+	Original Joke:
+	<br>
+	<p class="joke-text">{{original_joke}}</p>
+	<br>
+    {% for joke in joke_texts %}
+    Joke {{ loop.index }}
+    <br>
+    <p class="joke-text">{{ joke }}</p>
+    {% endfor %}
+    <a href="{{ url_for('similarity') }}" class="btn btn-lg btn-secondary">Another one!</a>
+</body>
+</html>
+{% endblock %}

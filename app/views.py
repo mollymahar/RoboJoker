@@ -44,8 +44,8 @@ def baseline():
         # first field is CSRF field - remove that from the output
         ratings = ratings[1:]
 
-        if all(rating == 'None' for rating in ratings):
-            error = 'Please rate at least 1 joke before proceeding!'
+        if any(rating == 'None' for rating in ratings):
+            error = 'Please rate all jokes before proceeding!'
             return render_template('baseline.html',
             jokes = jokes_text[offset:offset + 5], offset = offset, form = form, error = error)
 
@@ -368,3 +368,19 @@ def completion():
 def results():
     result = json.loads(session['result'])
     return render_template('results.html', result = result)
+
+@myapp.route('/similarity', methods=['GET','POST'])
+def similarity():
+	if request.method == 'POST':
+		text = request.form['text']
+		# processed_text = text.upper()
+		session['original_joke'] = text
+		session['similar_joke_indices'] = json.dumps(models.indices_of_similar(text))
+		return redirect('similarityresults')
+	return render_template("similarity.html")
+
+@myapp.route('/similarityresults', methods=['GET'])
+def similarity_results():
+	joke_texts = models.get_jokes(json.loads(session['similar_joke_indices']))
+	original_joke = session['original_joke']
+	return render_template("similarityresults.html", original_joke=original_joke,joke_texts=joke_texts)

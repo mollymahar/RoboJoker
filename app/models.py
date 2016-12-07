@@ -7,12 +7,19 @@ import sys
 from sklearn import linear_model
 import random
 import json
+import gensim
+import gensim.models.doc2vec
+from gensim.models import Doc2Vec
+
+
 
 ALL_JOKES = None
 PRINT_VERBOSE = True
 ALL_LATENT_TOPICS = None
-jokes_text_filename = 'combined_jokes_unique.csv'
+jokes_text_filename = 'nodups_combined_jokes.csv'
 features_filename = 'combined_features_unique.npy'
+model = Doc2Vec.load('doc2vecmodel.pkl')
+
 
 # utility print
 def cprint(s):
@@ -50,7 +57,7 @@ def load_jokes():
     if ALL_JOKES is None:
         if not os.path.isfile(jokes_text_filename):
             create_combined_jokes_file()
-        ALL_JOKES = pd.read_csv(jokes_text_filename, sep = ',', index_col = 0)
+        ALL_JOKES = pd.read_csv(jokes_text_filename, encoding = "ISO-8859-1", sep = ',', index_col = 0)
     return ALL_JOKES
 
 def load_latent_topics():
@@ -178,3 +185,34 @@ def get_bad_jokes(ratings_dict):
 def get_median_jokes(ratings_dict):
     global ALL_JOKES
     return get_n_jokes(ratings_dict, 5, ALL_JOKES.shape[0]//2-100, ALL_JOKES.shape[0]//2+100)
+
+# Convert text to lower-case and strip punctuation/symbols from words
+def normalize_text(text):
+    norm_text = text.lower()
+
+    # Replace breaks with spaces
+    norm_text = norm_text.replace('<br />', ' ')
+
+    # Pad punctuation with spaces on both sides
+    for char in ['.', '"', ',', '(', ')', '!', '?', ';', ':']:
+        norm_text = norm_text.replace(char, ' ' + char + ' ')
+
+    return norm_text
+
+def indices_of_similar(joke):
+    global model
+    # joke = ("Yo mama's like a brick. dirty, flat on both sides, and always getting laid by Mexicans.")
+    tokens = gensim.utils.to_unicode(normalize_text(joke)).split()
+    vector = model.infer_vector(tokens)
+    # print(dir(model))
+    sims = model.docvecs.most_similar([vector], topn=model.docvecs.count)  # get *all* similar documents
+    # just take first element from generated pairs of indexes and scores
+    sims = list(map(lambda x: int(x[0]), sims))
+    # print(sims[:5])
+    # print(get_jokes(sims[:4]))
+    return sims[:4]
+    # print(u'TARGET: «%s»\n' % (sample_text))
+    # print(u'SIMILAR/DISSIMILAR DOCS PER MODEL %s:\n' % model)
+    # for label, index in [('MOST', 2), ('MEDIAN', len(sims)//2), ('LEAST', len(sims) - 1)]:
+        # print(u'%s %s: «%s»\n' % (label, sims[index], ' '.join(alldocs[sims[index][0]].words)))
+
