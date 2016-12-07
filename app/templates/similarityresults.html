@@ -3,14 +3,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <body>
-	Original Joke:
-	<br>
+	<h3>Original Joke:</h3>
 	<p class="joke-text">{{original_joke}}</p>
 	<br>
+    <h3>Similar Jokes:</h3>
     {% for joke in joke_texts %}
     Joke {{ loop.index }}
     <br>
     <p class="joke-text">{{ joke }}</p>
+    <br>
     {% endfor %}
     <a href="{{ url_for('similarity') }}" class="btn btn-lg btn-secondary">Another one!</a>
 </body>

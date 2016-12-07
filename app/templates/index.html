@@ -6,31 +6,19 @@
 
     {% if rated_baseline == 'False' %}
 
-    <p class="lead">Thanks for exploring humor with us! We have two options for you: </p>
+    <p class="lead">Thanks for exploring humor with us! Here's what's going to happen:</p>
+    <p>
+        First, we're going to ask you to rate 20 jokes, so our algorithm gets a sense of what types of jokes you like. Then you'll have two options: you can either help us improve our algorithm by rating 15 more jokes (and seeing how well our predictions were), or you can get a set of jokes recommended to you.
+    </p>
     <br>
-    <div>
-        <p class="lead">Option 1: Joke Evaluation</p>
-        <ol>
-            <li>We will present you with 20 jokes, five at a time.</li>
-            <li>For each joke, you'll give us a rating of how good you think the joke is.</li>
-            <li>We'll feed those ratings into our super-secret algorithm.</li>
-            <li>Then we'll present you with some personalized joke recommendation, and we'll have you rate those, too.</li>
-        </ol>
-        <p>
-            And that's about it!
-        </p>
-        <br>
-        <a href="{{ url_for('baseline') }}" class="btn btn-lg btn-secondary">Let's begin!</a>
-    </div>
-    <div>
-        <br><br>
-        <p class="lead">Option 2: Joke Exploration</p>
-        <br>
-        <p>
-            Tell us a joke and we'll try to tell you similar ones in our database.
-        </p><br>
-        <a href="{{ url_for('similarity') }}" class="btn btn-lg btn-secondary">Similar Joke Finder</a>
-    </div>
+    <a href="{{ url_for('baseline') }}" class="btn btn-lg btn-secondary">Let's begin!</a>
+
+    <br><br>
+    <p>
+        Or, you can tell us a joke and we'll try to find you similar jokes from our database.
+    </p>
+    <br>
+    <a href="{{ url_for('similarity') }}" class="btn btn-lg btn-secondary">Similar Joke Finder</a>
 
     {% else %}
 

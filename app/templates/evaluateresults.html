@@ -9,6 +9,15 @@
     </p>
     {% endif %}
 
+    <!-- overall joke evaluation -->
+     <h3>For this evaluation, we showed you 5 jokes each that we thought would be good, bad, and median (in the middle of our recommendations).</h3>
+    <h4>On average, you gave those jokes these ratings:</h4>
+    <p>
+        Good Jokes: {{good_avg}}<br>
+        Median Jokes: {{median_avg}}<br>
+        Bad Jokes: {{bad_avg}}<br>
+    </p>
+<hr color="gray">
     <!-- individual joke ratings -->
     {% for joke in jokes %}
     Joke {{ loop.index }}
@@ -20,22 +29,15 @@
         Predicted Rating: {{guessed_ratings[loop.index - 1]}} <br>
         Your Actual Rating: {{ratings[loop.index - 1]}} <br>
         Joke Group: {{group[loop.index - 1]}}
-    </p> <br> <br>
+    </p> <br>
 
     <hr color="gray">
     {% endfor %}
 
-    <!-- overall joke evaluation -->
-    <p>
-        For this evaluation there are 5 jokes that are good, bad, and median (in the middle of our recommendations)<br>
-        Ratings Averages:<br>
-        Good Jokes: {{good_avg}}<br>
-        Median Jokes: {{median_avg}}<br>
-        Bad Jokes: {{bad_avg}}<br>
-    </p>
 
+<br>
     <p>
         <a href="{{ url_for('completion') }}" class="btn btn-lg btn-secondary">Finish!</a>
-    </p>
+    </p><br><br>
 </div>
 {% endblock %}
