@@ -6,11 +6,11 @@ Final project for INFO 256
 `pip install requirements.txt` (only need to do this once)  
 `python run.py`  
 
-**Heroku Commands (NOT APPLICABLE)**:  
+**Heroku Commands**:  
 `git push heroku master`  
 additional info: [deploying code into Heroku](https://devcenter.heroku.com/articles/git#deploying-code)
 
-**Git Commands**:  
+**Reference: Git Commands**:  
 Change branch locally -  
 `git checkout local_branch_name`  
 
